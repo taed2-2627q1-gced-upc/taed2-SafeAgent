@@ -1,0 +1,49 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "taed2_safeagent"
+version = "0.0.1"
+description = "A short description of the project."
+authors = [
+  { name = "SafeAgent" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+dependencies = [
+    "dvc[s3]>=3.67.1",
+    "loguru",
+    "mkdocs",
+    "mlflow>=3.16.0",
+    "pip",
+    "python-dotenv",
+    "ruff",
+    "tqdm",
+    "typer",
+]
+requires-python = "~=3.11.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["taed2_safeagent"]
+include = ["pyproject.toml", "taed2_safeagent/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["taed2_safeagent"]
+force-sort-within-sections = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.7",
+]
+
