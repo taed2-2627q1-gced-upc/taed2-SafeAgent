@@ -4,7 +4,13 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-A short description of the project.
+SafeAgent is an ML component that classifies shell commands proposed by AI coding agents as ALLOW, ASK, or DENY, exploring whether execution context improves risk classification while applying reproducible MLOps practices with DVC and MLflow.
+
+## Model Cards
+
+The [model cards](docs/model-cards/index.md) describe the planned
+classifiers, intended uses, limitations, and evaluation criteria. Training
+results will be added after reproducible runs are available.
 
 ## Project Organization
 
@@ -57,5 +63,13 @@ A short description of the project.
     └── plots.py                <- Code to create visualizations
 ```
 
---------
+## Documentation
+
+The documentation pages live in [`docs/`](docs/index.md). From the repository
+root, build or serve the MkDocs site with:
+
+```sh
+uv run mkdocs build
+uv run mkdocs serve
+```
 
