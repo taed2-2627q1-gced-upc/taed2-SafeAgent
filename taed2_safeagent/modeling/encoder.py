@@ -195,6 +195,7 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
     (output / "params.yaml").write_bytes(params_path.read_bytes())
     metadata = {
         "model": name,
+        "parameters": sum(parameter.numel() for parameter in model.parameters()),
         "backbone": backbone,
         "input_mode": mode,
         "labels": list(LABELS),
@@ -230,6 +231,9 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
         metrics = save_validation(trainer, examples, validation, output)
         trainer.model.save_pretrained(output / "model", safe_serialization=True)
         tokenizer.save_pretrained(output / "model")
+        metadata["model_bytes"] = sum(
+            path.stat().st_size for path in (output / "model").rglob("*") if path.is_file()
+        )
         metadata["best_validation_macro_f1"] = trainer.state.best_metric
     if code_identity() != source:
         raise ValueError("Source changed during encoder training")
