@@ -1,0 +1,44 @@
+source:
+  repository: tomngdev/shell-safety-v1.1
+  revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+  files:
+    train.jsonl:
+      rows: 30002
+      bytes: 23984713
+      sha256: 698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+    validation.jsonl:
+      rows: 3002
+      bytes: 2408952
+      sha256: ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+    test.jsonl:
+      rows: 1003
+      bytes: 804564
+      sha256: 23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+    README.md:
+      bytes: 580
+      sha256: 92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+paths:
+  raw: data/raw/shell_safety
+  interim: data/interim/shell_safety
+  processed: data/processed/shell_safety
+  reports: reports/data
+context:
+  version: safe_context_v1
+grouping:
+  version: command_context_v1
+  comment_markers: [wip, quick, tmp, bump, rebuild, after edit, v2, collect logs, smoke, fix lint, fmt]
+  ngram_size: 5
+  jaccard_numerator: 9
+  jaccard_denominator: 10
+split:
+  seed: 42
+  ratios:
+    train: 0.8
+    validation: 0.1
+    test: 0.1
+  tolerance: 0.01
+validation:
+  expected_clean_rows: 33325
+  expected_duplicate_rows: 680
+  expected_quarantine_rows: 2
+  require_ambiguous_commands: true

@@ -1,0 +1,5 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = s3://dvc
+    endpointurl = https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.s3

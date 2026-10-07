@@ -22,6 +22,7 @@ dependencies = [
     "mlflow>=3.16.0",
     "pip",
     "python-dotenv",
+    "PyYAML==6.0.3",
     "ruff",
     "tqdm",
     "typer",
@@ -44,6 +45,35 @@ force-sort-within-sections = true
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "pylint==4.1.2",
+    "pynblint==0.1.6",
     "ruff>=0.16.7",
 ]
+data = [
+    "deepchecks==0.19.1",
+    "great_expectations==1.23.2",
+    "numpy==1.26.4",
+    "pandas==2.2.3",
+    "scikit-learn==1.5.2",
+    "category-encoders==2.6.4",
+    "setuptools==80.9.0",
+    "typer==0.12.5",
+    "click==8.1.8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: checks the full pinned dataset"]
+
+[tool.pylint.main]
+py-version = "3.11"
+
+[tool.pylint.format]
+max-line-length = 99
+
+[tool.pylint.design]
+max-locals = 25
+
+[tool.pylint.messages_control]
+disable = ["missing-module-docstring", "missing-function-docstring"]
 

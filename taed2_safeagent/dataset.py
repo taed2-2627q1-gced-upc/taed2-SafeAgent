@@ -1,28 +1,31 @@
 from pathlib import Path
 
-from loguru import logger
-from tqdm import tqdm
 import typer
 
-from taed2_safeagent.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from taed2_safeagent.data.audit import audit as run_audit
+from taed2_safeagent.data.common import load_params
+from taed2_safeagent.data.source import fetch as run_fetch
+from taed2_safeagent.data.split import prepare as run_prepare
 
-app = typer.Typer()
+app = typer.Typer(help="Prepare and check the SafeAgent dataset.")
 
 
 @app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = RAW_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    # ----------------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Processing dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Processing dataset complete.")
-    # -----------------------------------------
+def fetch(params: Path = Path("params.yaml")):
+    run_fetch(load_params(params))
+    typer.echo("Raw snapshot checked")
+
+
+@app.command()
+def audit(params: Path = Path("params.yaml")):
+    run_audit(load_params(params))
+    typer.echo("Data audit complete")
+
+
+@app.command()
+def prepare(params: Path = Path("params.yaml")):
+    run_prepare(load_params(params))
+    typer.echo("Data splits prepared")
 
 
 if __name__ == "__main__":
