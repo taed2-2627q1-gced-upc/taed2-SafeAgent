@@ -463,7 +463,7 @@ stages:
     outs:
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: fb0c1ee10e66bb3a89c424630a166247.dir
+      md5: dc558c4caa5611ce8230a3d4db852fe8.dir
       size: 2126233
       nfiles: 2
   evaluate:
@@ -484,7 +484,7 @@ stages:
       size: 2248857
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: fb0c1ee10e66bb3a89c424630a166247.dir
+      md5: dc558c4caa5611ce8230a3d4db852fe8.dir
       size: 2126233
       nfiles: 2
     - path: pyproject.toml
