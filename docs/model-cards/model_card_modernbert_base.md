@@ -176,7 +176,7 @@ publish it under a separate model ID.
 
 #### Training Hyperparameters
 
-- **Training regime:** Planned supervised fine-tuning of ModernBERT-base and a classification head, exact learning rate, batch size, number of epochs, warm-up, weight decay, seed, maximum length, gradient accumulation, and mixed-precision setting are pending the first reproducible run
+- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The first full results remain pending.
 
 #### Speeds, Sizes, Times
 
@@ -284,9 +284,9 @@ memory are pending the first run.
 The planned stack includes Python 3.11, PyTorch, Hugging Face Transformers,
 Datasets, MLflow, DVC, and CodeCarbon. ModernBERT support requires a compatible
 Transformers version, exact versions, CUDA/runtime information, tokenizer and
-base-model revisions, seed, and training commit must be recorded. The current
-repository contains starter files but not yet a ModernBERT training
-implementation.
+base-model revisions, seed, and training commit must be recorded.
+The shared implementation is in modeling/encoder.py. The
+[encoder guide](../encoder-training.md) describes its commands and saved results.
 
 ## Citation
 

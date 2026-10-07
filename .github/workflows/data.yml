@@ -15,11 +15,11 @@ jobs:
           version: '0.10.10'
           enable-cache: true
           python-version: '3.11'
-      - run: uv sync --frozen --group data --group dev
+      - run: uv sync --frozen --group data --group dev --group training
       - run: uv run --frozen --group data dvc config --local cache.dir "${{ runner.temp }}/safeagent_dvc_cache"
-      - run: uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-      - run: uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-      - run: uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
+      - run: uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests kaggle_train.py
+      - run: uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests kaggle_train.py
+      - run: uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests kaggle_train.py
       - run: uv run --frozen --group data python -m taed2_safeagent.dataset fetch
       - run: uv run --frozen --group data dvc repro --force
       - run: uv run --frozen --group data pytest -q

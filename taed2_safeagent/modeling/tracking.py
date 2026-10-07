@@ -59,7 +59,7 @@ def check_inputs(root):
     source = code_identity()
     if not source["commit"] or source["dirty"] is not False:
         raise ValueError("Commit the source and settings before a tracked run")
-    if json.loads(dvc_command(root, "status", "--json")):
+    if json.loads(dvc_command(root, "status", "--json", "audit", "prepare", "validate")):
         raise ValueError("DVC inputs have changed, prepare them before training")
     lock = (root / "dvc.lock").read_bytes()
     return source, hashlib.sha256(lock).hexdigest()

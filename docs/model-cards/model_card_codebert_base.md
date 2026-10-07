@@ -166,7 +166,7 @@ added later, it must be a separate experiment with a distinct model ID.
 
 #### Training Hyperparameters
 
-- **Training regime:** Planned supervised fine-tuning of the encoder and classification head, exact learning rate, batch size, number of epochs, warm-up, weight decay, seed, maximum length, and mixed-precision setting are pending the first reproducible run
+- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The first full results remain pending.
 
 #### Speeds, Sizes, Times
 
@@ -268,8 +268,8 @@ the first run.
 The planned stack includes Python 3.11, PyTorch, Hugging Face Transformers,
 Datasets, MLflow, DVC, and CodeCarbon. Exact versions, tokenizer revision,
 CUDA/runtime information, seed, and training script commit must be recorded for
-reproducibility. The current repository contains starter files but not yet a
-CodeBERT training implementation.
+reproducibility. The shared training implementation is in modeling/encoder.py.
+The [encoder guide](../encoder-training.md) describes its commands and saved results.
 
 ## Citation
 

@@ -63,7 +63,8 @@ Commit the source and settings, check that DVC inputs are current, then run:
 uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --params params.yaml
 ```
 
-The command requires a clean Git checkout. It trains the fixed baseline and
+The command requires a clean Git checkout and current data stages.
+It trains the fixed baseline and
 evaluates validation, then saves the run identity in model metadata and uploads
 the new model version with DVC. MLflow receives settings, metrics, class results,
 raw and normalized confusion matrices, prepared ID predictions and the input and

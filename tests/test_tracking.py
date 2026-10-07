@@ -85,7 +85,7 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     assert client.create_run.call_args.kwargs["run_name"].endswith("__command__seed42")
     assert client.create_run.call_args.kwargs["tags"]["evaluation_split"] == "validation"
     assert tracked_run.commands == [
-        ("status", "--json"),
+        ("status", "--json", "audit", "prepare", "validate"),
         ("commit", "--force", "train", "evaluate"),
         ("push", "train"),
     ]

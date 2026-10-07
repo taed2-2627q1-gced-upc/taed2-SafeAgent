@@ -10,7 +10,7 @@ Use Python 3.11 and uv. Start with the [setup guide](docs/getting-started.md).
 It explains how to connect DVC and set up the local cache.
 
 ```sh
-uv sync --frozen --group data --group dev
+uv sync --frozen --group data --group dev --group training
 uv run --frozen --group data dvc pull
 uv run --frozen --group data dvc repro
 uv run --frozen --group data pytest -q
@@ -32,6 +32,8 @@ uv run --frozen --group data dvc repro evaluate
 ```
 
 See the [baseline guide](docs/baseline.md) for recovery and output files.
+The [encoder guide](docs/encoder-training.md) explains shared training for
+CodeBERT and ModernBERT with both input modes.
 The [validation results](reports/baseline/metrics.json) give macro F1 0.8613
 and DENY recall 0.8613, with 19 DENY examples predicted as ALLOW.
 The test partition is reserved for the final model comparison.
@@ -82,8 +84,8 @@ uv run --frozen --group data mkdocs build --strict
 GitHub Actions runs data and small model tests in one job. It downloads the
 public pinned snapshot and does not need personal DagsHub credentials.
 PyNBLint is installed for notebook checks when notebooks are available. Tracking tests
-use a fake client, so CI needs no DagsHub credentials. CodeCarbon measurements
-remain planned for Milestone 3.
+use a fake client, so CI needs no DagsHub credentials. Encoder training also
+records CodeCarbon readings, with estimates and missing sensors reported.
 
 Use make help for optional convenience commands. The uv commands also work
 without make.

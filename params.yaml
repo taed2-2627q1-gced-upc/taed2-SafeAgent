@@ -62,3 +62,26 @@ baseline:
 tracking:
   uri: https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow
   experiment: SafeAgent
+encoders:
+  backbones:
+    codebert:
+      name: microsoft/codebert-base
+      revision: 3b0952feddeffad0063f274080e3c23d75e7eb39
+    modernbert:
+      name: answerdotai/ModernBERT-base
+      revision: 8949b909ec900327062f0ebf497f51aef5e6f0c8
+  training:
+    seed: 42
+    epochs: 2
+    learning_rate: 0.00002
+    batch_size: 8
+    gradient_accumulation_steps: 4
+    max_length: 512
+    warmup_ratio: 0.1
+    weight_decay: 0.01
+    gradient_checkpointing: true
+energy:
+  country_iso_code: USA
+  country_assumed: true
+  measure_power_secs: 5
+  gpu_ids: "0"
