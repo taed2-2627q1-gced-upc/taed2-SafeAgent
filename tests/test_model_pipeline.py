@@ -19,10 +19,9 @@ def run_dvc(root, *arguments):
     return subprocess.run(
         command,
         cwd=root,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
         check=False,
+        text=True,
+        capture_output=True,
     )
 
 
