@@ -84,6 +84,10 @@ def test_dvc_reuses_outputs_and_retrains_after_settings_change(pipeline_project)
     assert not (root / "reports/baseline/mlflow_run.json").exists()
     lock = yaml.safe_load((root / "dvc.lock").read_text(encoding="utf-8"))
     assert lock["stages"]["train"]["outs"][0]["path"] == "models/baseline"
+    with (root / "taed2_safeagent/config.py").open("a", encoding="utf-8") as config:
+        config.write("\n# Updated config\n")
+    changed = json.loads(run_dvc(root, "status", "--json").stdout)
+    assert {"train", "evaluate"} <= changed.keys()
 
 
 def test_failed_training_stops_pipeline_before_evaluation(pipeline_project):
