@@ -36,6 +36,14 @@ The Kaggle account is `joelmrquezalvarez`, which differs from the GitHub account
 
 ## Notebook setup
 
+The [CPU baseline notebook](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/blob/main/notebooks/kaggle_baseline.ipynb)
+contains the setup and the two execution paths. Set its full published source
+commit, actual notebook reference and saved source version before running it.
+For a new submission, enter its intended next version and confirm it on the
+saved run page afterward. A mismatch needs correction in the downloaded session
+record before using that result as experiment evidence.
+The exported session marks its notebook version as pending confirmation.
+
 Use a private Python notebook with Internet enabled and Accelerator set to None
 for the CPU baseline. Internet is needed to clone GitHub, install the frozen
 environment and reach DVC and MLflow.
@@ -61,7 +69,7 @@ in notebook outputs.
 ## Reproducible source and data
 
 Start from a published full Git commit, then clone that version into a writable
-directory under `/kaggle/working`. Reusable code stays in `taed2_safeagent`.
+directory under `/kaggle/temp`. Reusable code stays in `taed2_safeagent`.
 Kaggle's installed packages do not replace the project's Python 3.11 environment
 or `uv.lock`. From that checkout, install and recover the prepared data:
 
@@ -104,6 +112,12 @@ The shared experiment is `SafeAgent` at
 through DVC. A failed remote operation is an error, with no local tracking fallback.
 The run receipt is `reports/baseline/mlflow_run.json`. Recovered receipts belong
 to their original runs and are not evidence of a new Kaggle experiment.
+
+The notebook exports selected files to `/kaggle/working/safeagent-results`.
+The model, reports, settings and `session.json` identify the result, with the
+recovered input version in `input_dvc.lock`. A formal run also exports its new
+`output_dvc.lock`. Development training does not version or upload its new model.
+The temporary checkout, installed environment and caches are not exported.
 
 ## Save source and results
 
