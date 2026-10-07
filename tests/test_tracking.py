@@ -37,17 +37,22 @@ def tracking_setup(baseline_params, tmp_path, monkeypatch):
 
     def fake_dvc(root, *arguments):
         commands.append(arguments)
-        if arguments[0] == "add":
-            directory = root / arguments[1]
+        if arguments[0] == "commit":
             write_json(
-                Path(f"{directory}.dvc"),
+                root / "dvc.lock",
                 {
-                    "outs": [
-                        {
-                            "md5": "c" * 32 + ".dir",
-                            "path": directory.name,
+                    "stages": {
+                        "train": {
+                            "outs": [
+                                {
+                                    "md5": "c" * 32 + ".dir",
+                                    "path": baseline_params["baseline"]["model_dir"]
+                                    .relative_to(root)
+                                    .as_posix(),
+                                }
+                            ]
                         }
-                    ]
+                    }
                 },
             )
         return "{}" if arguments[0] == "status" else ""
@@ -79,7 +84,14 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     client.create_run.assert_called_once()
     assert client.create_run.call_args.kwargs["run_name"].endswith("__command__seed42")
     assert client.create_run.call_args.kwargs["tags"]["evaluation_split"] == "validation"
-    assert [arguments[0] for arguments in tracked_run.commands] == ["status", "add", "push"]
+    assert tracked_run.commands == [
+        ("status", "--json"),
+        ("commit", "--force", "train", "evaluate"),
+        ("push", "train"),
+    ]
+    assert result["model_dvc_path"] == "dvc.lock"
+    assert result["model_dvc_stage"] == "train"
+    client.log_text.assert_called_once_with("run42", "stages: {}\n", "input_dvc.lock")
     model = tracked_run.params["baseline"]["model_dir"]
     metadata = json.loads((model / "metadata.json").read_text(encoding="utf-8"))
     metrics = json.loads(
@@ -98,7 +110,6 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     artifacts = {Path(call.args[1]).name for call in client.log_artifact.call_args_list}
     assert artifacts == {
         "metadata.json",
-        "baseline.dvc",
         "dvc.lock",
         "metrics.json",
         "predictions.jsonl",
@@ -164,7 +175,7 @@ def test_new_experiment_is_created_only_when_missing(tracked_run):
     tracked_run.client.create_experiment.assert_called_once_with("SafeAgent")
 
 
-@pytest.mark.parametrize("stage", ["train", "evaluate", "add", "push", "log_artifact"])
+@pytest.mark.parametrize("stage", ["train", "evaluate", "commit", "push", "log_artifact"])
 def test_failed_stages_mark_run_failed_without_success_receipt(tracked_run, monkeypatch, stage):
     error = MlflowException("test_secret")
     if stage in {"train", "evaluate"}:
@@ -240,14 +251,14 @@ def test_dvc_failure_uses_project_python_and_redacts_output(tmp_path, monkeypatc
     execute = Mock(return_value=SimpleNamespace(returncode=1, stdout="", stderr="test_secret"))
     monkeypatch.setattr(subprocess, "run", execute)
     with pytest.raises(RuntimeError, match="DVC push failed") as failure:
-        tracking.dvc_command(tmp_path, "push", "models/baseline.dvc")
+        tracking.dvc_command(tmp_path, "push", "train")
     assert "test_secret" not in str(failure.value)
     assert execute.call_args.args[0] == [
         sys.executable,
         "-m",
         "dvc",
         "push",
-        "models/baseline.dvc",
+        "train",
     ]
     assert execute.call_args.kwargs["cwd"] == tmp_path
 

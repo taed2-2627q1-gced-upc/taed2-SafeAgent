@@ -2,7 +2,6 @@ import hashlib
 from importlib.metadata import version
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 from time import time
@@ -66,10 +65,14 @@ def check_inputs(root):
 
 def save_model_version(root, directory):
     relative = directory.relative_to(root).as_posix()
-    dvc_command(root, "add", relative)
-    pointer = Path(f"{directory}.dvc")
-    dvc_command(root, "push", pointer.relative_to(root).as_posix())
-    return pointer, yaml.safe_load(pointer.read_text(encoding="utf-8"))["outs"][0]["md5"]
+    dvc_command(root, "commit", "--force", "train", "evaluate")
+    lock = root / "dvc.lock"
+    outputs = yaml.safe_load(lock.read_text(encoding="utf-8"))["stages"]["train"]["outs"]
+    versions = [output["md5"] for output in outputs if output["path"] == relative]
+    if len(versions) != 1 or not versions[0].endswith(".dir"):
+        raise ValueError("Missing trained model version in dvc.lock")
+    dvc_command(root, "push", "train")
+    return lock, versions[0]
 
 
 def metric_values(metadata, metrics):
