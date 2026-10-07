@@ -1,7 +1,7 @@
 # SafeAgent
 
 SafeAgent classifies proposed shell commands as ALLOW, ASK or DENY.
-We compare command inputs with command and execution context inputs.
+The project compares command inputs with command and execution context inputs.
 The component reads commands as text and never runs them.
 
 ## Reproduce the data
@@ -34,6 +34,17 @@ See the [baseline guide](docs/baseline.md) for recovery and output files.
 The [validation results](reports/baseline/metrics.json) give macro F1 0.8613
 and DENY recall 0.8613, with 19 DENY examples predicted as ALLOW.
 The test partition is reserved for the final model comparison.
+
+The baseline also supports shared MLflow tracking. Follow the
+[experiment setup](docs/baseline.md#record-an-experiment) to configure credentials,
+then run from a clean committed checkout:
+
+```sh
+uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --params params.yaml
+```
+
+This trains the baseline, evaluates validation, uploads the model with DVC and
+records the run in DagsHub. The run link is saved in reports/baseline/mlflow_run.json.
 
 ## Project layout
 
@@ -68,9 +79,9 @@ uv run --frozen --group data mkdocs build --strict
 
 GitHub Actions runs data and small model tests in one job. It downloads the
 public pinned snapshot and does not need personal DagsHub credentials.
-PyNBLint is installed, but there are no notebooks to check yet. Shared MLflow
-tracking is planned for the next PR and CodeCarbon measurements
-for Milestone 3.
+PyNBLint is installed, but there are no notebooks to check yet. Tracking tests
+use a fake client, so CI needs no DagsHub credentials. CodeCarbon measurements
+remain planned for Milestone 3.
 
 Use make help for optional convenience commands. The uv commands also work
 without make.

@@ -1,6 +1,6 @@
 outs:
-- md5: 15ca8874fff938fb67ee2c678661468b.dir
-  size: 2125961
+- md5: d0d5038fb26c5a0b3f6f0716e92ec8f3.dir
+  size: 2126234
   nfiles: 2
   hash: md5
   path: tfidf_char_linear_svm

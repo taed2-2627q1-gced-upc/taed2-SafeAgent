@@ -59,3 +59,6 @@ baseline:
     dual: auto
     tol: 0.0001
     max_iter: 10000
+tracking:
+  uri: https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow
+  experiment: SafeAgent

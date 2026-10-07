@@ -27,7 +27,7 @@ The results below come from validation only. The final test is still reserved.
 
 ### Model Description
 
-We use a small classical model as a starting point for the later encoder
+The small classical model is a starting point for the later encoder
 experiments. It reads the command string only, so it can also help measure
 whether adding execution context improves the same model family.
 
@@ -137,7 +137,7 @@ The classifier converged in 61 iterations and the vocabulary has 100,000 feature
 
 #### Speeds, Sizes, Times
 
-Fitting the vectorizer and classifier took 7.60 seconds on a local Intel Core
+Fitting the vectorizer and classifier took 4.30 seconds on a local Intel Core
 i7-1255U CPU. This timing excludes data loading and saving the model.
 The compressed pipeline is 2,124,861 bytes, about 2.03 MiB.
 Inference latency and peak memory have not been benchmarked.
@@ -161,13 +161,14 @@ must stay outside the feature input for this command baseline.
 
 #### Metrics
 
-We report accuracy, balanced accuracy, macro F1, per class precision, recall,
-F1 and support, and the confusion matrix. We also count true DENY examples
+The reports include accuracy, balanced accuracy, macro F1, per class precision, recall,
+F1 and support, and the confusion matrix. They also count true DENY examples
 predicted as ALLOW and divide that count by all true DENY examples.
 
 ### Results
 
-Local validation run on 2026-10-07:
+Recorded validation run on 2026-10-07, available in
+[MLflow on DagsHub](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/1b2eb37037e34d82ad87c5ba86613c99):
 
 | Metric | Value |
 | --- | --- |
@@ -197,7 +198,7 @@ identity and the clean source commit are recorded in the saved metadata.
 
 #### Summary
 
-This gives us a useful first comparison point, but the 19 DENY to ALLOW errors
+This gives the project a useful first comparison point, but the 19 DENY to ALLOW errors
 still matter. The results do not establish safety on real agent traffic.
 
 ## Model Examination
@@ -240,8 +241,9 @@ Peak RAM use has not been measured.
 #### Software
 
 Python 3.11, scikit-learn 1.5.2, NumPy 1.26.4 and joblib 1.6.0, with the
-environment fixed in uv.lock. DVC stores the fitted model. Shared MLflow
-tracking is planned for the next PR and no shared run was logged here.
+environment fixed in uv.lock. DVC stores the fitted model. Shared MLflow tracking
+uses the experiment command in the [baseline guide](../baseline.md). Its receipt
+records the completed run link. Energy tracking remains planned for Milestone 3.
 
 ## Citation
 

@@ -1,9 +1,9 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help requirements fetch data train evaluate test lint docs
+.PHONY: help requirements fetch data train evaluate experiment test lint docs
 
 help:
-	@echo "Targets: requirements fetch data train evaluate test lint docs"
+	@echo "Targets: requirements fetch data train evaluate experiment test lint docs"
 
 ## Install the locked environment
 requirements:
@@ -24,6 +24,10 @@ train:
 ## Evaluate on validation data
 evaluate:
 	uv run --frozen --group data python -m taed2_safeagent.modeling.evaluate --params params.yaml
+
+## Record a shared baseline run
+experiment:
+	uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --params params.yaml
 
 ## Check data and model behavior
 test:
