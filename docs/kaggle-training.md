@@ -151,6 +151,18 @@ MLflow run link and later output commit recorded separately. Review generated
 models, metrics and run receipts before publishing output metadata, and confirm
 the required DVC upload. Kaggle outputs are a way to transfer results.
 
+## Local notebook checks
+
+Local checks passed for notebook format, Python syntax, both execution paths,
+secret redaction, command failures and selected result export. Ruff passed and
+Pylint checked the extracted cells with an allowance for the Kaggle secrets
+import, which is only available on the notebook host.
+
+PyNBLint 0.1.6 ran with findings. The notebook is unexecuted, and the scan of the
+notebook folder reports missing Git, dependency and coverage metadata. Git and
+`pyproject.toml` are at the project root, and coverage was not collected.
+Cloud execution remains pending.
+
 ## Later GPU training
 
 CodeBERT and ModernBERT need separate implemented training code and locked
