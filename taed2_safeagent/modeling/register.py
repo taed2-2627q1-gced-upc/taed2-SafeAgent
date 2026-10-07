@@ -12,7 +12,13 @@ import yaml
 from taed2_safeagent.data.common import LABELS, load_params, read_jsonl, write_json
 from taed2_safeagent.modeling.common import code_identity, dataset_identity, load_examples
 from taed2_safeagent.modeling.evaluate import compute_metrics
-from taed2_safeagent.modeling.tracking import dvc_command, mark_failed, tracking_client
+from taed2_safeagent.modeling.tracking import (
+    dvc_command,
+    evaluation_metric_values,
+    get_experiment_id,
+    mark_failed,
+    tracking_client,
+)
 
 app = typer.Typer(pretty_exceptions_show_locals=False)
 
@@ -76,19 +82,7 @@ def checked_result(result, params):
 
 
 def shared_metrics(metadata, metrics, energy):
-    values = {
-        key: metrics[key]
-        for key in (
-            "accuracy",
-            "balanced_accuracy",
-            "macro_f1",
-            "deny_to_allow_count",
-            "deny_to_allow_rate",
-        )
-    }
-    for label in LABELS:
-        for key, value in metrics["classes"][label].items():
-            values[f"{label.lower()}_{key}"] = value
+    values = evaluation_metric_values(metrics)
     for key in ("training_seconds", "parameters", "model_bytes"):
         values[key] = metadata[key]
     if energy["status"] == "recorded":
@@ -169,12 +163,7 @@ def register_result(params_path, result, session_path):
     if target.exists() or report.exists():
         raise ValueError("This result already exists, inspect it before another registration")
     client = tracking_client(params["tracking"])
-    experiment = client.get_experiment_by_name(params["tracking"]["experiment"])
-    experiment_id = (
-        experiment.experiment_id
-        if experiment
-        else client.create_experiment(params["tracking"]["experiment"])
-    )
+    experiment_id = get_experiment_id(client, params["tracking"]["experiment"])
     run = client.create_run(
         experiment_id,
         start_time=metadata["start_time_ms"],
