@@ -116,7 +116,8 @@ to their original runs and are not evidence of a new Kaggle experiment.
 The notebook exports selected files to `/kaggle/working/safeagent-results`.
 The model, reports, settings and `session.json` identify the result, with the
 recovered input version in `input_dvc.lock`. A formal run also exports its new
-`output_dvc.lock`. Development training does not version or upload its new model.
+`output_dvc.lock` and the model version metadata named by its run receipt in the
+original relative path. Development training does not version or upload its new model.
 The temporary checkout, installed environment and caches are not exported.
 
 ## Save source and results
