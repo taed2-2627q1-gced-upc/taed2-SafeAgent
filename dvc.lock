@@ -1,0 +1,336 @@
+schema: '2.0'
+stages:
+  audit:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset audit
+    deps:
+    - path: data/raw/shell_safety
+      hash: md5
+      md5: dc780b6882b222a55d4453aa15629ff4.dir
+      size: 27199384
+      nfiles: 5
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/config.py
+      hash: md5
+      md5: a31a5b75d6d1523cc4cd2a394824fb37
+      size: 819
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/audit.py
+      hash: md5
+      md5: 991c919d8d7b195852cca6c98c86cabd
+      size: 5610
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/grouping.py
+      hash: md5
+      md5: 93aaefa9a53a7ef3f4cbf75f0aa7a519
+      size: 3706
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/data/source.py
+      hash: md5
+      md5: 86355bdc7fd49eab5061131651355388
+      size: 3007
+    - path: taed2_safeagent/data/split.py
+      hash: md5
+      md5: 47f8fa851c8489ec773a1c077a7fded3
+      size: 3560
+    - path: taed2_safeagent/data/validation.py
+      hash: md5
+      md5: ed144edc70a0c9fc455605157e3f546d
+      size: 8546
+    - path: taed2_safeagent/dataset.py
+      hash: md5
+      md5: 443bd6a15eb88e48a4ab3a1afc73bd24
+      size: 1256
+    - path: uv.lock
+      hash: md5
+      md5: c0c20ddfb46d1366970d3c23251361e4
+      size: 363986
+    params:
+      params.yaml:
+        context:
+          version: safe_context_v1
+        paths:
+          raw: data/raw/shell_safety
+          interim: data/interim/shell_safety
+          processed: data/processed/shell_safety
+          reports: reports/data
+        source:
+          repository: tomngdev/shell-safety-v1.1
+          revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+          files:
+            train.jsonl:
+              rows: 30002
+              bytes: 23984713
+              sha256:
+                698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+            validation.jsonl:
+              rows: 3002
+              bytes: 2408952
+              sha256:
+                ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+            test.jsonl:
+              rows: 1003
+              bytes: 804564
+              sha256:
+                23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+            README.md:
+              bytes: 580
+              sha256:
+                92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+        validation:
+          expected_clean_rows: 33325
+          expected_duplicate_rows: 680
+          expected_quarantine_rows: 2
+          require_ambiguous_commands: true
+    outs:
+    - path: data/interim/shell_safety
+      hash: md5
+      md5: b33e953bb5fc25a9cd4e9dfe15ee08e9.dir
+      size: 26537428
+      nfiles: 3
+    - path: reports/data/audit.json
+      hash: md5
+      md5: b54198448f70b7999f0a5628032ed75f
+      size: 1069
+  prepare:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset prepare
+    deps:
+    - path: data/interim/shell_safety
+      hash: md5
+      md5: b33e953bb5fc25a9cd4e9dfe15ee08e9.dir
+      size: 26537428
+      nfiles: 3
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/config.py
+      hash: md5
+      md5: a31a5b75d6d1523cc4cd2a394824fb37
+      size: 819
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/audit.py
+      hash: md5
+      md5: 991c919d8d7b195852cca6c98c86cabd
+      size: 5610
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/grouping.py
+      hash: md5
+      md5: 93aaefa9a53a7ef3f4cbf75f0aa7a519
+      size: 3706
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/data/source.py
+      hash: md5
+      md5: 86355bdc7fd49eab5061131651355388
+      size: 3007
+    - path: taed2_safeagent/data/split.py
+      hash: md5
+      md5: 47f8fa851c8489ec773a1c077a7fded3
+      size: 3560
+    - path: taed2_safeagent/data/validation.py
+      hash: md5
+      md5: ed144edc70a0c9fc455605157e3f546d
+      size: 8546
+    - path: taed2_safeagent/dataset.py
+      hash: md5
+      md5: 443bd6a15eb88e48a4ab3a1afc73bd24
+      size: 1256
+    - path: uv.lock
+      hash: md5
+      md5: c0c20ddfb46d1366970d3c23251361e4
+      size: 363986
+    params:
+      params.yaml:
+        context:
+          version: safe_context_v1
+        grouping:
+          version: command_context_v1
+          comment_markers:
+          - wip
+          - quick
+          - tmp
+          - bump
+          - rebuild
+          - after edit
+          - v2
+          - collect logs
+          - smoke
+          - fix lint
+          - fmt
+          ngram_size: 5
+          jaccard_numerator: 9
+          jaccard_denominator: 10
+        paths:
+          raw: data/raw/shell_safety
+          interim: data/interim/shell_safety
+          processed: data/processed/shell_safety
+          reports: reports/data
+        split:
+          seed: 42
+          ratios:
+            train: 0.8
+            validation: 0.1
+            test: 0.1
+          tolerance: 0.01
+    outs:
+    - path: data/processed/shell_safety
+      hash: md5
+      md5: f53520fb6f7d31b2a86424a1f9e1e4eb.dir
+      size: 22250712
+      nfiles: 4
+    - path: reports/data/split.json
+      hash: md5
+      md5: fe351d99ea4d7f32d50d7c40e80f2b85
+      size: 577
+  validate:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset validate
+    deps:
+    - path: data/interim/shell_safety
+      hash: md5
+      md5: b33e953bb5fc25a9cd4e9dfe15ee08e9.dir
+      size: 26537428
+      nfiles: 3
+    - path: data/processed/shell_safety
+      hash: md5
+      md5: f53520fb6f7d31b2a86424a1f9e1e4eb.dir
+      size: 22250712
+      nfiles: 4
+    - path: data/raw/shell_safety
+      hash: md5
+      md5: dc780b6882b222a55d4453aa15629ff4.dir
+      size: 27199384
+      nfiles: 5
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/config.py
+      hash: md5
+      md5: a31a5b75d6d1523cc4cd2a394824fb37
+      size: 819
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/audit.py
+      hash: md5
+      md5: 991c919d8d7b195852cca6c98c86cabd
+      size: 5610
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/grouping.py
+      hash: md5
+      md5: 93aaefa9a53a7ef3f4cbf75f0aa7a519
+      size: 3706
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/data/source.py
+      hash: md5
+      md5: 86355bdc7fd49eab5061131651355388
+      size: 3007
+    - path: taed2_safeagent/data/split.py
+      hash: md5
+      md5: 47f8fa851c8489ec773a1c077a7fded3
+      size: 3560
+    - path: taed2_safeagent/data/validation.py
+      hash: md5
+      md5: ed144edc70a0c9fc455605157e3f546d
+      size: 8546
+    - path: taed2_safeagent/dataset.py
+      hash: md5
+      md5: 443bd6a15eb88e48a4ab3a1afc73bd24
+      size: 1256
+    - path: uv.lock
+      hash: md5
+      md5: c0c20ddfb46d1366970d3c23251361e4
+      size: 363986
+    params:
+      params.yaml:
+        context:
+          version: safe_context_v1
+        grouping:
+          version: command_context_v1
+          comment_markers:
+          - wip
+          - quick
+          - tmp
+          - bump
+          - rebuild
+          - after edit
+          - v2
+          - collect logs
+          - smoke
+          - fix lint
+          - fmt
+          ngram_size: 5
+          jaccard_numerator: 9
+          jaccard_denominator: 10
+        paths:
+          raw: data/raw/shell_safety
+          interim: data/interim/shell_safety
+          processed: data/processed/shell_safety
+          reports: reports/data
+        source:
+          repository: tomngdev/shell-safety-v1.1
+          revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+          files:
+            train.jsonl:
+              rows: 30002
+              bytes: 23984713
+              sha256:
+                698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+            validation.jsonl:
+              rows: 3002
+              bytes: 2408952
+              sha256:
+                ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+            test.jsonl:
+              rows: 1003
+              bytes: 804564
+              sha256:
+                23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+            README.md:
+              bytes: 580
+              sha256:
+                92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+        split:
+          seed: 42
+          ratios:
+            train: 0.8
+            validation: 0.1
+            test: 0.1
+          tolerance: 0.01
+        validation:
+          expected_clean_rows: 33325
+          expected_duplicate_rows: 680
+          expected_quarantine_rows: 2
+          require_ambiguous_commands: true
+    outs:
+    - path: reports/data/validation.json
+      hash: md5
+      md5: 1d82906c4f0f789003e6930308c61486
+      size: 1332

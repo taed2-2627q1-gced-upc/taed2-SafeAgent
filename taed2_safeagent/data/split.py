@@ -86,9 +86,7 @@ def prepare(params):
         processed / "manifest.json",
         {
             "source": {key: params["source"][key] for key in ("repository", "revision")},
-            "context": params["context"],
-            "grouping": params["grouping"],
-            "split": params["split"],
+            "protocol": {key: params[key] for key in ("context", "grouping", "split")},
             "labels": list(LABELS),
             "input_modes": ["command", "command-context"],
             **report,

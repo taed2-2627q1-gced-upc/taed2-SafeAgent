@@ -1,0 +1,81 @@
+stages:
+  audit:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset audit
+    deps:
+      - data/raw/shell_safety
+      - taed2_safeagent/data/audit.py
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/source.py
+      - taed2_safeagent/data/grouping.py
+      - taed2_safeagent/data/split.py
+      - taed2_safeagent/data/validation.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/dataset.py
+      - taed2_safeagent/__init__.py
+      - taed2_safeagent/config.py
+      - uv.lock
+    params:
+      - source
+      - context
+      - paths
+      - validation
+    outs:
+      - data/interim/shell_safety
+    metrics:
+      - reports/data/audit.json:
+          cache: false
+  prepare:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset prepare
+    deps:
+      - data/interim/shell_safety
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/grouping.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/split.py
+      - taed2_safeagent/data/audit.py
+      - taed2_safeagent/data/source.py
+      - taed2_safeagent/data/validation.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/dataset.py
+      - taed2_safeagent/__init__.py
+      - taed2_safeagent/config.py
+      - uv.lock
+    params:
+      - context
+      - grouping
+      - split
+      - paths
+    outs:
+      - data/processed/shell_safety
+    metrics:
+      - reports/data/split.json:
+          cache: false
+  validate:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.dataset validate
+    deps:
+      - data/raw/shell_safety
+      - data/interim/shell_safety
+      - data/processed/shell_safety
+      - taed2_safeagent/data/audit.py
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/grouping.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/source.py
+      - taed2_safeagent/data/split.py
+      - taed2_safeagent/data/validation.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/dataset.py
+      - taed2_safeagent/__init__.py
+      - taed2_safeagent/config.py
+      - uv.lock
+    params:
+      - source
+      - context
+      - grouping
+      - split
+      - paths
+      - validation
+    metrics:
+      - reports/data/validation.json:
+          cache: false

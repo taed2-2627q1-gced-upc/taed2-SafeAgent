@@ -1,0 +1,11 @@
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
+*.dvc text eol=lf
+*.json text eol=lf
+Makefile text eol=lf
+.dvc/config text eol=lf
+.dvc/.gitignore text eol=lf
+.dvcignore text eol=lf
