@@ -6,8 +6,6 @@ nav:
   - Getting started: getting-started.md
   - First baseline: baseline.md
   - Encoder training: encoder-training.md
-  - Milestone 2 report: milestone-2.md
-  - First presentation: milestone-2-presentation.md
   - Dataset card: dataset-card.md
   - Model cards:
       - Overview: model-cards/index.md
