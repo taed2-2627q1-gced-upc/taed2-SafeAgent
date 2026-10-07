@@ -22,3 +22,5 @@ to train or recover the models.
 
 See the [getting started guide](getting-started.md) and the
 [repository README](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent#readme).
+See [feature ownership](feature-ownership.md) for team responsibilities and the
+pull request review protocol.
