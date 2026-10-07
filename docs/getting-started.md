@@ -63,14 +63,15 @@ A failed validation exits with an error and removes a stale success report.
 ## Checks and docs
 
 ```sh
-uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py tests
-uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py tests
-uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py tests
+uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
+uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
+uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
 uv run --frozen --group data pytest -q
 uv run --frozen --group data mkdocs build --strict
 ```
 
 The full dataset integration test needs prepared data. Without it, that check is
 reported as skipped. CI prepares the actual snapshot before running all tests.
-PyNBLint becomes applicable when notebooks are added. This data pipeline does
-not train a model or create MLflow and CodeCarbon records.
+PyNBLint becomes applicable when notebooks are added. Follow the
+[baseline guide](baseline.md) for local training and validation evaluation.
+The data stages do not train a model or create MLflow and CodeCarbon records.

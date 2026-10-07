@@ -12,9 +12,10 @@ recovery, DVC reproduction and quality checks.
 
 ## Model cards
 
-The [model cards](model-cards/index.md) document the three planned classifiers,
-their intended uses, limitations, and evaluation plans. They are drafts;
-trained artifacts and evaluation results are pending.
+The [model cards](model-cards/index.md) document the three classifiers and their
+limits. The first TF-IDF and SVM baseline has validation results, while the
+transformer cards still describe planned work. See the [baseline guide](baseline.md)
+to train or recover the first model and evaluate it.
 
 ## Project setup
 

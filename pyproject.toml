@@ -20,6 +20,9 @@ dependencies = [
     "loguru",
     "mkdocs",
     "mlflow>=3.16.0",
+    "numpy==1.26.4",
+    "scikit-learn==1.5.2",
+    "joblib==1.6.0",
     "pip",
     "python-dotenv",
     "PyYAML==6.0.3",
@@ -52,9 +55,7 @@ dev = [
 data = [
     "deepchecks==0.19.1",
     "great_expectations==1.23.2",
-    "numpy==1.26.4",
     "pandas==2.2.3",
-    "scikit-learn==1.5.2",
     "category-encoders==2.6.4",
     "setuptools==80.9.0",
     "typer==0.12.5",
@@ -76,4 +77,3 @@ max-locals = 25
 
 [tool.pylint.messages_control]
 disable = ["missing-module-docstring", "missing-function-docstring"]
-

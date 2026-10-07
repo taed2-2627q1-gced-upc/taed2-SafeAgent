@@ -1,29 +1,24 @@
-from pathlib import Path
+from functools import partial
 
-from loguru import logger
-from tqdm import tqdm
-import typer
-
-from taed2_safeagent.config import PROCESSED_DATA_DIR
-
-app = typer.Typer()
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Generating features from dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Features generation complete.")
-    # -----------------------------------------
+def character_ngrams(text, ngram_range):
+    return [
+        text[start : start + size]
+        for size in range(ngram_range[0], ngram_range[1] + 1)
+        for start in range(len(text) - size + 1)
+    ]
 
 
-if __name__ == "__main__":
-    app()
+def make_vectorizer(settings):
+    settings = dict(settings)
+    ngram_range = tuple(settings.pop("ngram_range"))
+    if len(ngram_range) != 2 or not 1 <= ngram_range[0] <= ngram_range[1]:
+        raise ValueError("Invalid character range")
+    return TfidfVectorizer(
+        analyzer=partial(character_ngrams, ngram_range=ngram_range),
+        dtype=np.float32,
+        **settings,
+    )
