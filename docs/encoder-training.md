@@ -65,3 +65,14 @@ Cloud results need their actual Kaggle session and saved version recorded.
 After download, their data and model versions must be checked before DVC upload
 and shared MLflow registration. Registration must retain the original execution
 source and timestamps, separately from the commit containing returned results.
+
+Use the registration command after confirming the saved session version:
+
+```sh
+uv run --frozen --group data python -m taed2_safeagent.modeling.register /path/to/model/result /path/to/session.json
+```
+
+Registration checks the saved validation predictions and configuration, uploads
+the model through DVC and records the run in shared MLflow. Small metrics and
+run links go in reports/encoders. Commit each completed result before registering
+the next one, keeping its original training source and separate upload source.
