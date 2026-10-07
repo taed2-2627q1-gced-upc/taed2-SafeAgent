@@ -84,7 +84,12 @@ def log_input_lock(client, run_id, content):
         client.log_artifact(run_id, str(lock))
 
 
-def metric_values(metadata, metrics):
+def get_experiment_id(client, name):
+    experiment = client.get_experiment_by_name(name)
+    return experiment.experiment_id if experiment else client.create_experiment(name)
+
+
+def evaluation_metric_values(metrics):
     values = {
         key: metrics[key]
         for key in (
@@ -95,16 +100,22 @@ def metric_values(metadata, metrics):
             "deny_to_allow_rate",
         )
     }
-    values.update(
-        {
-            key: metadata[key]
-            for key in ("training_seconds", "train_rows", "features", "iterations")
-        }
-    )
     for label, scores in metrics["classes"].items():
         for name in ("precision", "recall", "f1-score", "support"):
             values[f"{label.lower()}_{name.replace('-score', '')}"] = scores[name]
     return {name: value for name, value in values.items() if value is not None}
+
+
+def metric_values(metadata, metrics):
+    values = evaluation_metric_values(metrics)
+    values.update(
+        {
+            key: metadata[key]
+            for key in ("training_seconds", "train_rows", "features", "iterations")
+            if metadata[key] is not None
+        }
+    )
+    return values
 
 
 def log_results(client, run_id, files, metadata, metrics):

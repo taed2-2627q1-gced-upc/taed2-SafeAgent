@@ -8,6 +8,7 @@ from taed2_safeagent.modeling.common import load_config
 from taed2_safeagent.modeling.evaluate import evaluate
 from taed2_safeagent.modeling.tracking import (
     check_inputs,
+    get_experiment_id,
     log_input_lock,
     log_results,
     mark_failed,
@@ -38,12 +39,7 @@ def run_experiment(params, root):
         "evaluation_split": "validation",
     }
     try:
-        experiment = client.get_experiment_by_name(params["tracking"]["experiment"])
-        experiment_id = (
-            experiment.experiment_id
-            if experiment
-            else client.create_experiment(params["tracking"]["experiment"])
-        )
+        experiment_id = get_experiment_id(client, params["tracking"]["experiment"])
         run = client.create_run(experiment_id, run_name=name, tags=tags)
     except MlflowException:
         raise RuntimeError("Could not start the shared experiment") from None
