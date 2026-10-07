@@ -22,12 +22,10 @@ license_name: Apache 2.0 for the ModernBERT backbone, project artifact terms pen
 
 # Model Card for ModernBERT-base Shell Safety Classifier
 
-This is the third initial SafeAgent model. It is planned as a three-class
-sequence classifier obtained by fine-tuning `answerdotai/ModernBERT-base` on a
-serialized pair of `command` and `session_context`. Its purpose is to test a
-stronger contextual encoder and the project's main question: whether execution
-context improves shell-command risk classification. No SafeAgent fine-tuned
-checkpoint or evaluation result is currently available.
+The SafeAgent ModernBERT classifier predicts ALLOW, ASK or DENY for shell
+commands. Command and command with context variants have been fitted on
+the same prepared data, keeping the backbone and split fixed for comparison.
+The validation results and saved artifacts are linked below.
 
 ## Model Details
 
@@ -112,34 +110,23 @@ injection, obfuscation, command chaining, and state-dependent behavior.
 
 ## How to Get Started with the Model
 
-No SafeAgent fine-tuned checkpoint is currently published. Once one exists, an
-illustrative inference pattern is:
+Recover the fitted model with DVC and install the frozen training group.
+The artifact includes its tokenizer and explicit class mapping.
 
 ```python
 from transformers import pipeline
 from taed2_safeagent.data.inputs import build_input
 
-classifier = pipeline(
-    "text-classification",
-    model="models/modernbert_shell_safety",
-    tokenizer="models/modernbert_shell_safety",
-)
-
-command = "git clean -fdx"
-context = {
-    "gitRemote": None,
-    "gitStatus": {"untracked": [], "modified": ["src/app.py"], "staged": []},
-    "agentTouchedFiles": [],
-}
-
-text = build_input({"command": command, "context": context}, "command-context")
-result = classifier(text)[0]
-print(result)  # label and score, do not execute automatically
+model_path = "models/encoders/modernbert__command-context__2__a740d875"
+classifier = pipeline("text-classification", model=model_path, tokenizer=model_path)
+example = {"command": "git status", "context": {}}
+text = build_input(example, "command-context")
+result = classifier(text, truncation=True, max_length=512)[0]
+print(result)
 ```
 
-The example above shows the planned model call. Use the frozen input builder
-from the Dataset Card for the actual command and context text. The final artifact must document its exact format, truncation rule,
-label-ID mapping, tokenizer revision, and missing-context behavior.
+The scores have not been calibrated as safety probabilities. Commands
+are analyzed without execution.
 
 ## Training Details
 
@@ -152,7 +139,7 @@ input builder and prepared IDs. Predictive text excludes reason, category,
 assistant text, shell tags and source metadata. A context ablation must
 keep the model family and selection protocol fixed.
 
-The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in our audit of the pinned source. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in the pinned source audit. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
 
 The primary ModernBERT experiment uses command and the allowed safe_context_v1
 profile. Shell may be used only in a separate ablation or analysis. Training
@@ -176,15 +163,17 @@ publish it under a separate model ID.
 
 #### Training Hyperparameters
 
-- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The first full results remain pending.
+- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The saved runs use these settings.
 
 #### Speeds, Sizes, Times
 
-Not measured for the SafeAgent fine-tune. The ModernBERT model card reports a
-base model with 22 layers and approximately 149 million parameters, and a
-native context length of up to 8,192 tokens. The actual SafeAgent checkpoint
-size, sequence length, peak memory, throughput, latency, and training time must
-be measured on the selected hardware.
+The fitted classifier has 149,607,171 parameters. Inference
+latency and peak memory have not been measured.
+
+| Input | Fitting seconds | Model and tokenizer MiB |
+| --- | ---: | ---: |
+| command | 792.5 | 574.2 |
+| command-context | 1354.9 | 574.2 |
 
 ## Evaluation
 
@@ -215,15 +204,22 @@ on complete versus missing/stale-context slices. If scores route cases to
 
 ### Results
 
-No SafeAgent fine-tuning or evaluation run has been committed yet. Results are
-**pending**, the ModernBERT base model's published benchmark results are not
-results for this shell-safety classifier.
+Both modes use 26,660 training and 3,333 validation examples from the strict
+group split. The 3,332 test examples remain reserved. These validation
+scores on synthetic examples do not establish safety on live commands.
+
+| Input | Macro F1 | DENY recall | DENY predicted ALLOW | Shared run |
+| --- | ---: | ---: | ---: | --- |
+| command | 0.8647 | 0.8547 | 22 | [MLflow](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/4851c0df192344fa99eacf1721bdbafe) |
+| command-context | 0.8953 | 0.8678 | 14 | [MLflow](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/5ed5c367a6c8481d93a744ce97e7a7b0) |
+
+The linked runs include per class metrics and raw and normalized confusion
+matrices. DVC recovers the weights and aligned validation predictions.
 
 #### Summary
 
-This model is the contextual, higher-capacity candidate in the initial set. Its
-value must be demonstrated by a fair comparison against command-only models,
-including safety, latency, size, energy, cost, and operational reliability.
+One seed and two epochs provide an initial paired comparison.
+Final model selection also needs safety errors and serving checks.
 
 ## Model Examination
 
@@ -235,21 +231,22 @@ or execution guarantees.
 
 ## Environmental Impact
 
-The SafeAgent fine-tuning run has not yet been measured. Training is expected
-to use a Kaggle GPU workflow when available, CodeCarbon should be enabled for
-the actual run.
+CodeCarbon covered fitting and epoch validation on Kaggle using GPU 0.
+GPU power monitoring was available, while CPU power used a constant
+fallback estimate and RAM power is estimated. The USA carbon factor is
+assumed because the physical region is unverified. The second allocated
+GPU is excluded, so these estimates do not cover the full allocated machine.
 
-- **Hardware Type:** Not measured, GPU expected for fine-tuning
-- **Hours used:** Not measured
-- **Cloud Provider:** Expected Kaggle, not yet confirmed for a run
-- **Compute Region:** Not recorded
-- **Carbon Emitted:** Not measured
+| Input | Energy kWh | Emissions kg CO2e | Duration seconds |
+| --- | ---: | ---: | ---: |
+| command | 0.025860 | 0.009555 | 791.3 |
+| command-context | 0.044334 | 0.016380 | 1353.7 |
 
 ## Technical Specifications
 
 ### Model Architecture and Objective
 
-The planned task-specific architecture is:
+The fitted architecture is:
 
 ```text
 command + session_context
@@ -268,25 +265,16 @@ decision policy must be stored with the fine-tuning configuration.
 
 ### Compute Infrastructure
 
-Fine-tuning is expected to run on a Kaggle GPU or comparable accelerator. Mixed
-precision and Flash Attention may be considered where the selected software and
-hardware support them, but their effect on correctness and reproducibility must
-be tested. Benchmark deployment inference on the actual target CPU/GPU and on
-long-context edge cases.
-
-#### Hardware
-
-Exact GPU model, VRAM, CPU, RAM, context length, training duration, and peak
-memory are pending the first run.
+Fitting used one visible Tesla T4 GPU on Kaggle with mixed precision and
+PyTorch SDPA attention. ModernBERT compilation was disabled. Peak memory
+and deployment inference latency remain unmeasured.
 
 #### Software
 
-The planned stack includes Python 3.11, PyTorch, Hugging Face Transformers,
-Datasets, MLflow, DVC, and CodeCarbon. ModernBERT support requires a compatible
-Transformers version, exact versions, CUDA/runtime information, tokenizer and
-base-model revisions, seed, and training commit must be recorded.
-The shared implementation is in modeling/encoder.py. The
-[encoder guide](../encoder-training.md) describes its commands and saved results.
+The frozen environment uses Python 3.11, PyTorch 2.8.0,
+Transformers 4.57.6, Accelerate 1.11.0 and CodeCarbon 3.2.2. The source,
+backbone and data versions are saved with each run. Settings are in
+params.yaml. See the [encoder guide](../encoder-training.md).
 
 ## Citation
 
@@ -327,9 +315,8 @@ when redistributing the complete project.
 
 ## More Information
 
-See the [documentation overview](../index.md) for the shared project context.
-Link the final checkpoint, DVC pointer, MLflow run, context serialization
-specification, and evaluation report here once they exist.
+The result table links the shared runs, while reports/encoders stores
+their small metrics and run links. DVC pointers recover fitted models.
 
 ## Model Card Authors
 

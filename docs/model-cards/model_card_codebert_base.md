@@ -21,12 +21,10 @@ license_name: Project artifact license to be defined, backbone terms apply
 
 # Model Card for CodeBERT-base Shell Safety Classifier
 
-This is the second initial SafeAgent model. It is planned as a three-class
-sequence classifier obtained by fine-tuning `microsoft/codebert-base` on shell
-commands from `tomngdev/shell-safety-v1.1`. The primary comparison uses the
-`command` field only, so the effect of a code-pretrained encoder can be
-compared fairly with the TF-IDF baseline. No fine-tuned checkpoint or project
-evaluation result is currently available.
+The SafeAgent CodeBERT classifier predicts ALLOW, ASK or DENY for shell
+commands. Command and command with context variants have been fitted on
+the same prepared data, keeping the backbone and split fixed for comparison.
+The validation results and saved artifacts are linked below.
 
 ## Model Details
 
@@ -112,23 +110,23 @@ checksum.
 
 ## How to Get Started with the Model
 
-No SafeAgent fine-tuned checkpoint is currently published. After a checkpoint
-has been trained and exported, an illustrative inference pattern is:
+Recover the fitted model with DVC and install the frozen training group.
+The artifact includes its tokenizer and explicit class mapping.
 
 ```python
 from transformers import pipeline
+from taed2_safeagent.data.inputs import build_input
 
-classifier = pipeline(
-    "text-classification",
-    model="models/codebert_shell_safety",
-    tokenizer="models/codebert_shell_safety",
-)
-result = classifier("sudo apt-get remove openssh-server")[0]
-print(result)  # label and score, do not execute the command automatically
+model_path = "models/encoders/codebert__command__2__a740d875"
+classifier = pipeline("text-classification", model=model_path, tokenizer=model_path)
+example = {"command": "git status", "context": {}}
+text = build_input(example, "command")
+result = classifier(text, truncation=True, max_length=512)[0]
+print(result)
 ```
 
-The final artifact must include an explicit mapping from model label IDs to
-`ALLOW`, `ASK`, and `DENY`, plus the tokenizer and preprocessing configuration.
+The scores have not been calibrated as safety probabilities. Commands
+are analyzed without execution.
 
 ## Training Details
 
@@ -141,7 +139,7 @@ input builder and prepared IDs. Predictive text excludes reason, category,
 assistant text, shell tags and source metadata. A context ablation must
 keep the model family and selection protocol fixed.
 
-The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in our audit of the pinned source. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in the pinned source audit. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
 
 The primary CodeBERT experiment uses `command` only. `session_context` is
 reserved for a separately named context experiment, `category` and `reason` are
@@ -166,14 +164,17 @@ added later, it must be a separate experiment with a distinct model ID.
 
 #### Training Hyperparameters
 
-- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The first full results remain pending.
+- **Training regime:** The shared trainer fine tunes the encoder and classification head in both input modes. Initial settings use two epochs, learning rate 0.00002, effective batch 32, seed 42 and a 512 token limit. GPU runs use mixed precision and validation selects the best epoch. The saved runs use these settings.
 
 #### Speeds, Sizes, Times
 
-Not measured for the SafeAgent fine-tune. The base model is approximately
-125M parameters according to the project planning description, final parameter
-count, checkpoint size, peak memory, throughput, latency, and training time
-must be recorded from the actual artifact and hardware.
+The fitted classifier has 124,647,939 parameters. Inference
+latency and peak memory have not been measured.
+
+| Input | Fitting seconds | Model and tokenizer MiB |
+| --- | ---: | ---: |
+| command | 480.0 | 480.1 |
+| command-context | 835.3 | 480.1 |
 
 ## Evaluation
 
@@ -202,16 +203,22 @@ to `ASK`, also report calibration and coverage-risk curves.
 
 ### Results
 
-No SafeAgent fine-tuning or evaluation run has been committed yet. Results are
-**pending**, the base CodeBERT paper's results on its own NL-PL tasks must not
-be presented as results for shell-command safety.
+Both modes use 26,660 training and 3,333 validation examples from the strict
+group split. The 3,332 test examples remain reserved. These validation
+scores on synthetic examples do not establish safety on live commands.
+
+| Input | Macro F1 | DENY recall | DENY predicted ALLOW | Shared run |
+| --- | ---: | ---: | ---: | --- |
+| command | 0.8857 | 0.8442 | 18 | [MLflow](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/a81f878bbbff4019b032b389a0909c01) |
+| command-context | 0.8977 | 0.8586 | 7 | [MLflow](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/c3532eb8a9c34146926bc9d2e10d047a) |
+
+The linked runs include per class metrics and raw and normalized confusion
+matrices. DVC recovers the weights and aligned validation predictions.
 
 #### Summary
 
-This model tests whether a code-pretrained encoder improves over the lexical
-baseline while keeping the primary input fixed to `command`. Selection of a
-final production candidate must consider safety, latency, size, cost, energy,
-and operational reliability.
+One seed and two epochs provide an initial paired comparison.
+Final model selection also needs safety errors and serving checks.
 
 ## Model Examination
 
@@ -222,21 +229,22 @@ of safety or a substitute for executing only inside independent controls.
 
 ## Environmental Impact
 
-The SafeAgent fine-tuning run has not yet been measured. Training is expected
-to use a Kaggle GPU workflow when available, CodeCarbon should be enabled for
-the actual run.
+CodeCarbon covered fitting and epoch validation on Kaggle using GPU 0.
+GPU power monitoring was available, while CPU power used a constant
+fallback estimate and RAM power is estimated. The USA carbon factor is
+assumed because the physical region is unverified. The second allocated
+GPU is excluded, so these estimates do not cover the full allocated machine.
 
-- **Hardware Type:** Not measured, GPU expected for fine-tuning
-- **Hours used:** Not measured
-- **Cloud Provider:** Expected Kaggle, not yet confirmed for a run
-- **Compute Region:** Not recorded
-- **Carbon Emitted:** Not measured
+| Input | Energy kWh | Emissions kg CO2e | Duration seconds |
+| --- | ---: | ---: | ---: |
+| command | 0.015644 | 0.005780 | 478.8 |
+| command-context | 0.027262 | 0.010073 | 834.1 |
 
 ## Technical Specifications
 
 ### Model Architecture and Objective
 
-The project model is planned as:
+The fitted architecture is:
 
 ```text
 command string
@@ -253,23 +261,16 @@ with the fine-tuning configuration.
 
 ### Compute Infrastructure
 
-Fine-tuning is expected to run on a Kaggle GPU or comparable accelerator. Mixed
-precision may be used if numerically validated. Inference should be benchmarked
-on the intended deployment CPU as well as the training GPU because operational
-latency may differ substantially.
-
-#### Hardware
-
-Exact GPU model, VRAM, CPU, RAM, training duration, and peak memory are pending
-the first run.
+Fitting used one visible Tesla T4 GPU on Kaggle with mixed precision and
+PyTorch SDPA attention. ModernBERT compilation was disabled. Peak memory
+and deployment inference latency remain unmeasured.
 
 #### Software
 
-The planned stack includes Python 3.11, PyTorch, Hugging Face Transformers,
-Datasets, MLflow, DVC, and CodeCarbon. Exact versions, tokenizer revision,
-CUDA/runtime information, seed, and training script commit must be recorded for
-reproducibility. The shared training implementation is in modeling/encoder.py.
-The [encoder guide](../encoder-training.md) describes its commands and saved results.
+The frozen environment uses Python 3.11, PyTorch 2.8.0,
+Transformers 4.57.6, Accelerate 1.11.0 and CodeCarbon 3.2.2. The source,
+backbone and data versions are saved with each run. Settings are in
+params.yaml. See the [encoder guide](../encoder-training.md).
 
 ## Citation
 
@@ -307,9 +308,8 @@ when redistributing the complete project.
 
 ## More Information
 
-See the [documentation overview](../index.md) for the shared project context.
-Link the final checkpoint, DVC pointer, MLflow run, and evaluation report here
-once they exist.
+The result table links the shared runs, while reports/encoders stores
+their small metrics and run links. DVC pointers recover fitted models.
 
 ## Model Card Authors
 
