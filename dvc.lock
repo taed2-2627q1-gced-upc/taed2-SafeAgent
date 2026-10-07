@@ -463,8 +463,8 @@ stages:
     outs:
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: b3b4dd51740ee26584c76a5c7ef0a29c.dir
-      size: 2125961
+      md5: fb0c1ee10e66bb3a89c424630a166247.dir
+      size: 2126233
       nfiles: 2
   evaluate:
     cmd: uv run --frozen --group data python -m
@@ -484,8 +484,8 @@ stages:
       size: 2248857
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: b3b4dd51740ee26584c76a5c7ef0a29c.dir
-      size: 2125961
+      md5: fb0c1ee10e66bb3a89c424630a166247.dir
+      size: 2126233
       nfiles: 2
     - path: pyproject.toml
       hash: md5
