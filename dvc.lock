@@ -334,3 +334,264 @@ stages:
       hash: md5
       md5: 1d82906c4f0f789003e6930308c61486
       size: 1332
+  train:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train
+      --params params.yaml
+    deps:
+    - path: data/processed/shell_safety/manifest.json
+      hash: md5
+      md5: 324b4c319c992f8fc2edf5ea932a9716
+      size: 1122
+    - path: data/processed/shell_safety/train.jsonl
+      hash: md5
+      md5: 287a9060dcf23b8e13856e5059153562
+      size: 17796175
+    - path: pyproject.toml
+      hash: md5
+      md5: 9cc0d80deda7b1c8e11392397fe7db63
+      size: 1509
+    - path: reports/data/validation.json
+      hash: md5
+      md5: 1d82906c4f0f789003e6930308c61486
+      size: 1332
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/features.py
+      hash: md5
+      md5: 760e94623a20bb05fe4a48adf7f7bd2c
+      size: 710
+    - path: taed2_safeagent/modeling/__init__.py
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: taed2_safeagent/modeling/common.py
+      hash: md5
+      md5: 4a0b6c6a44093f469a3b9604c7815459
+      size: 3868
+    - path: taed2_safeagent/modeling/train.py
+      hash: md5
+      md5: 578c460c8ee4594a6fca05b8ebfa171a
+      size: 2693
+    - path: uv.lock
+      hash: md5
+      md5: 980e5b3714161f57995897278a1c1304
+      size: 364059
+    params:
+      params.yaml:
+        baseline.input_mode: command
+        baseline.model_dir: models/tfidf_char_linear_svm
+        baseline.report_dir: reports/baseline
+        baseline.svm:
+          C: 1.0
+          class_weight: balanced
+          random_state: 42
+          dual: auto
+          tol: 0.0001
+          max_iter: 10000
+        baseline.tfidf:
+          ngram_range:
+          - 2
+          - 5
+          min_df: 2
+          max_features: 100000
+          sublinear_tf: true
+          norm: l2
+        context:
+          version: safe_context_v1
+        grouping:
+          version: command_context_v1
+          comment_markers:
+          - wip
+          - quick
+          - tmp
+          - bump
+          - rebuild
+          - after edit
+          - v2
+          - collect logs
+          - smoke
+          - fix lint
+          - fmt
+          ngram_size: 5
+          jaccard_numerator: 9
+          jaccard_denominator: 10
+        paths.processed: data/processed/shell_safety
+        source:
+          repository: tomngdev/shell-safety-v1.1
+          revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+          files:
+            train.jsonl:
+              rows: 30002
+              bytes: 23984713
+              sha256:
+                698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+            validation.jsonl:
+              rows: 3002
+              bytes: 2408952
+              sha256:
+                ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+            test.jsonl:
+              rows: 1003
+              bytes: 804564
+              sha256:
+                23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+            README.md:
+              bytes: 580
+              sha256:
+                92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+        split:
+          seed: 42
+          ratios:
+            train: 0.8
+            validation: 0.1
+            test: 0.1
+          tolerance: 0.01
+    outs:
+    - path: models/tfidf_char_linear_svm
+      hash: md5
+      md5: b3b4dd51740ee26584c76a5c7ef0a29c.dir
+      size: 2125961
+      nfiles: 2
+  evaluate:
+    cmd: uv run --frozen --group data python -m
+      taed2_safeagent.modeling.evaluate --params params.yaml
+    deps:
+    - path: data/processed/shell_safety/manifest.json
+      hash: md5
+      md5: 324b4c319c992f8fc2edf5ea932a9716
+      size: 1122
+    - path: data/processed/shell_safety/train.jsonl
+      hash: md5
+      md5: 287a9060dcf23b8e13856e5059153562
+      size: 17796175
+    - path: data/processed/shell_safety/validation.jsonl
+      hash: md5
+      md5: 4587e01ad1c12ddb2c50ebbe6d54d242
+      size: 2248857
+    - path: models/tfidf_char_linear_svm
+      hash: md5
+      md5: b3b4dd51740ee26584c76a5c7ef0a29c.dir
+      size: 2125961
+      nfiles: 2
+    - path: pyproject.toml
+      hash: md5
+      md5: 9cc0d80deda7b1c8e11392397fe7db63
+      size: 1509
+    - path: reports/data/validation.json
+      hash: md5
+      md5: 1d82906c4f0f789003e6930308c61486
+      size: 1332
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/features.py
+      hash: md5
+      md5: 760e94623a20bb05fe4a48adf7f7bd2c
+      size: 710
+    - path: taed2_safeagent/modeling/__init__.py
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: taed2_safeagent/modeling/common.py
+      hash: md5
+      md5: 4a0b6c6a44093f469a3b9604c7815459
+      size: 3868
+    - path: taed2_safeagent/modeling/evaluate.py
+      hash: md5
+      md5: bffb85e5b310926dbd4bc37c83913765
+      size: 3661
+    - path: uv.lock
+      hash: md5
+      md5: 980e5b3714161f57995897278a1c1304
+      size: 364059
+    params:
+      params.yaml:
+        baseline.input_mode: command
+        baseline.model_dir: models/tfidf_char_linear_svm
+        baseline.report_dir: reports/baseline
+        context:
+          version: safe_context_v1
+        grouping:
+          version: command_context_v1
+          comment_markers:
+          - wip
+          - quick
+          - tmp
+          - bump
+          - rebuild
+          - after edit
+          - v2
+          - collect logs
+          - smoke
+          - fix lint
+          - fmt
+          ngram_size: 5
+          jaccard_numerator: 9
+          jaccard_denominator: 10
+        paths.processed: data/processed/shell_safety
+        source:
+          repository: tomngdev/shell-safety-v1.1
+          revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+          files:
+            train.jsonl:
+              rows: 30002
+              bytes: 23984713
+              sha256:
+                698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+            validation.jsonl:
+              rows: 3002
+              bytes: 2408952
+              sha256:
+                ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+            test.jsonl:
+              rows: 1003
+              bytes: 804564
+              sha256:
+                23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+            README.md:
+              bytes: 580
+              sha256:
+                92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+        split:
+          seed: 42
+          ratios:
+            train: 0.8
+            validation: 0.1
+            test: 0.1
+          tolerance: 0.01
+    outs:
+    - path: reports/baseline/metrics.json
+      hash: md5
+      md5: 21277aa25250f1f667802a11c0d2b3d5
+      size: 960
+    - path: reports/baseline/predictions.jsonl
+      hash: md5
+      md5: 2ed7dca6f653170ad8f8e7d790d22131
+      size: 397095
