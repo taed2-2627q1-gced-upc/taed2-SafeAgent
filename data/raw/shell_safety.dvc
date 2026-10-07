@@ -1,0 +1,6 @@
+outs:
+- md5: dc780b6882b222a55d4453aa15629ff4.dir
+  size: 27199384
+  nfiles: 5
+  hash: md5
+  path: shell_safety

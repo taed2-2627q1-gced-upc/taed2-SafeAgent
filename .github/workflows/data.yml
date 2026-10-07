@@ -1,0 +1,31 @@
+name: Data checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  data:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff
+        with:
+          version: '0.10.10'
+          enable-cache: true
+          python-version: '3.11'
+      - run: uv sync --frozen --group data --group dev
+      - run: uv run --frozen --group data dvc config --local cache.dir "${{ runner.temp }}/safeagent_dvc_cache"
+      - run: uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py tests
+      - run: uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py tests
+      - run: uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py tests
+      - run: uv run --frozen --group data python -m taed2_safeagent.dataset fetch
+      - run: uv run --frozen --group data dvc repro --force
+      - run: uv run --frozen --group data pytest -q
+      - run: uv run --frozen --group data mkdocs build --strict
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: data-reports
+          path: reports/data/*.json

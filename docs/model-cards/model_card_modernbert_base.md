@@ -13,7 +13,7 @@ tags:
   - execution-context
   - draft
 dataset:
-  - tomngdev/shell-safety-v2
+  - tomngdev/shell-safety-v1.1
 base_model: answerdotai/ModernBERT-base
 status: draft
 license: apache-2.0
@@ -52,7 +52,7 @@ execution sandbox.
 
 - **Project repository:** [taed2-SafeAgent on GitHub](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent)
 - **Base model:** [answerdotai/ModernBERT-base](https://huggingface.co/answerdotai/ModernBERT-base)
-- **Fine-tuning dataset:** [tomngdev/shell-safety-v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+- **Fine-tuning dataset:** [tomngdev/shell-safety-v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 - **Paper:** [Smarter, Better, Faster, Longer: A Modern Bidirectional Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference](https://arxiv.org/abs/2412.13663)
 - **Demo:** Not available
 
@@ -117,6 +117,7 @@ illustrative inference pattern is:
 
 ```python
 from transformers import pipeline
+from taed2_safeagent.data.inputs import build_input
 
 classifier = pipeline(
     "text-classification",
@@ -125,27 +126,38 @@ classifier = pipeline(
 )
 
 command = "git clean -fdx"
-session_context = "git status: modified files present, repository: local"
-text = f"Command: {command}\nSession context:\n{session_context}"
+context = {
+    "gitRemote": None,
+    "gitStatus": {"untracked": [], "modified": ["src/app.py"], "staged": []},
+    "agentTouchedFiles": [],
+}
+
+text = build_input({"command": command, "context": context}, "command-context")
 result = classifier(text)[0]
 print(result)  # label and score, do not execute automatically
 ```
 
-The serialization shown is a planned example, not yet a frozen project
-interface. The final artifact must document its exact format, truncation rule,
+The example above shows the planned model call. Use the frozen input builder
+from the Dataset Card for the actual command and context text. The final artifact must document its exact format, truncation rule,
 label-ID mapping, tokenizer revision, and missing-context behavior.
 
 ## Training Details
 
 ### Training Data
 
-The project fine-tuning source is [Shell Safety v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2), a synthetic dataset with 34,007 examples according to its dataset card. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+The data protocol is fixed in the [Dataset Card](../dataset-card.md).
+Use revision fee89770c315d525ef2ee42adee6ef9725a7621e and the strict group
+split with 26,660 train, 3,333 validation and 3,332 test rows. Use the shared
+input builder and prepared IDs. Predictive text excludes reason, category,
+assistant text, shell tags and source metadata. A context ablation must
+keep the model family and selection protocol fixed.
 
-The primary ModernBERT experiment uses `command + session_context`. `shell` may
-be used only in a separately documented ablation or analysis. `category` and
-`reason` are excluded from model inputs to reduce target leakage. The exact
-dataset revision, split counts, duplicate policy, class balance, missing-context
-rate, and serialization version must be recorded at training time.
+The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in our audit of the pinned source. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+
+The primary ModernBERT experiment uses command and the allowed safe_context_v1
+profile. Shell may be used only in a separate ablation or analysis. Training
+must reference the fixed data protocol and its DVC version. Missing optional
+context fields follow the null defaults in the shared input builder.
 
 The ModernBERT base model was pretrained on approximately 2 trillion tokens of
 English text and code. That pretraining corpus is distinct from the project's
@@ -301,7 +313,7 @@ bidirectional encoder for fast, memory efficient, and long context finetuning
 and inference*. arXiv:2412.13663.
 
 Also cite the [ModernBERT model card](https://huggingface.co/answerdotai/ModernBERT-base)
-and the [Shell Safety v2 dataset](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+and the [Shell Safety v1.1 dataset](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 when redistributing the complete project.
 
 ## Glossary

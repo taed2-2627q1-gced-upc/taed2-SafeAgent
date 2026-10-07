@@ -12,7 +12,7 @@ tags:
   - codebert
   - draft
 dataset:
-  - tomngdev/shell-safety-v2
+  - tomngdev/shell-safety-v1.1
 base_model: microsoft/codebert-base
 status: draft
 license: other
@@ -23,7 +23,7 @@ license_name: Project artifact license to be defined, backbone terms apply
 
 This is the second initial SafeAgent model. It is planned as a three-class
 sequence classifier obtained by fine-tuning `microsoft/codebert-base` on shell
-commands from `tomngdev/shell-safety-v2`. The primary comparison uses the
+commands from `tomngdev/shell-safety-v1.1`. The primary comparison uses the
 `command` field only, so the effect of a code-pretrained encoder can be
 compared fairly with the TF-IDF baseline. No fine-tuned checkpoint or project
 evaluation result is currently available.
@@ -51,7 +51,7 @@ CodeBERT model and not a command-executing agent.
 - **Project repository:** [taed2-SafeAgent on GitHub](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent)
 - **Base model:** [microsoft/codebert-base](https://huggingface.co/microsoft/codebert-base)
 - **Base-model source code:** [Microsoft CodeBERT repository](https://github.com/microsoft/CodeBERT)
-- **Fine-tuning dataset:** [tomngdev/shell-safety-v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+- **Fine-tuning dataset:** [tomngdev/shell-safety-v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 - **Paper:** [CodeBERT: A Pre-Trained Model for Programming and Natural Languages](https://arxiv.org/abs/2002.08155)
 - **Demo:** Not available
 
@@ -134,7 +134,14 @@ The final artifact must include an explicit mapping from model label IDs to
 
 ### Training Data
 
-The project fine-tuning source is [Shell Safety v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2), a synthetic dataset with 34,007 examples according to its dataset card. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+The data protocol is fixed in the [Dataset Card](../dataset-card.md).
+Use revision fee89770c315d525ef2ee42adee6ef9725a7621e and the strict group
+split with 26,660 train, 3,333 validation and 3,332 test rows. Use the shared
+input builder and prepared IDs. Predictive text excludes reason, category,
+assistant text, shell tags and source metadata. A context ablation must
+keep the model family and selection protocol fixed.
+
+The project fine-tuning source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset with 34,007 examples in our audit of the pinned source. Relevant fields are `command`, `session_context`, `label`, `category`, `shell`, and `reason`. The target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
 
 The primary CodeBERT experiment uses `command` only. `session_context` is
 reserved for a separately named context experiment, `category` and `reason` are
@@ -285,7 +292,7 @@ Feng, Z., Guo, D., Tang, D., Duan, N., Feng, X., Gong, M., Shou, L., Qin, B.,
 Liu, T., Jiang, D., & Zhou, M. (2020). *CodeBERT: A pre-trained model for
 programming and natural languages*. arXiv:2002.08155.
 
-Also cite the [Shell Safety v2 dataset](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+Also cite the [Shell Safety v1.1 dataset](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 and the [Microsoft CodeBERT repository](https://github.com/microsoft/CodeBERT)
 when redistributing the complete project.
 

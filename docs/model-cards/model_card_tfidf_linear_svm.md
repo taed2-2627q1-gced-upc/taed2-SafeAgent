@@ -11,7 +11,7 @@ tags:
   - multiclass-classification
   - draft
 dataset:
-  - tomngdev/shell-safety-v2
+  - tomngdev/shell-safety-v1.1
 status: draft
 license: other
 license_name: Project artifact license to be defined
@@ -46,7 +46,7 @@ adding contextual encoders.
 ### Model Sources
 
 - **Repository:** [taed2-SafeAgent on GitHub](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent)
-- **Dataset:** [tomngdev/shell-safety-v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+- **Dataset:** [tomngdev/shell-safety-v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 - **Implementation references:** [TfidfVectorizer documentation](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html), [LinearSVC documentation](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html)
 - **Paper:** Not applicable to this project-specific combination
 - **Demo:** Not available
@@ -133,7 +133,14 @@ The code predicts a label, it does not run the command.
 
 ### Training Data
 
-The planned training source is [Shell Safety v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2), a synthetic dataset of 34,007 examples with `command`, `session_context`, `label`, `category`, `shell`, and `reason` fields. The project target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
+The data protocol is fixed in the [Dataset Card](../dataset-card.md).
+Use revision fee89770c315d525ef2ee42adee6ef9725a7621e and the strict group
+split with 26,660 train, 3,333 validation and 3,332 test rows. Use the shared
+input builder and prepared IDs. Predictive text excludes reason, category,
+assistant text, shell tags and source metadata. A context ablation must
+keep the model family and selection protocol fixed.
+
+The planned training source is [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1), a synthetic dataset of 34,007 examples with `command`, `session_context`, `label`, `category`, `shell`, and `reason` fields. The project target is `label`, normalized to the uppercase classes `ALLOW`, `ASK`, and `DENY`.
 
 For this baseline, only `command` is used as a predictive feature. `session_context`
 is retained for later comparison experiments, while `category` and `reason` are
@@ -264,7 +271,7 @@ references and the dataset when reusing it:
 
 - [TfidfVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html)
 - [LinearSVC](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html)
-- [Shell Safety v2](https://huggingface.co/datasets/tomngdev/shell-safety-v2)
+- [Shell Safety v1.1](https://huggingface.co/datasets/tomngdev/shell-safety-v1.1)
 
 ## Glossary
 
