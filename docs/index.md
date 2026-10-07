@@ -21,3 +21,5 @@ to train or recover the first model and evaluate it.
 
 See the [getting started guide](getting-started.md) and the
 [repository README](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent#readme).
+The [Kaggle guide](kaggle-training.md) explains notebook setup, secrets and
+reproducible baseline execution before later GPU experiments.

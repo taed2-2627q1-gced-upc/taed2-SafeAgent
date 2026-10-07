@@ -6,6 +6,7 @@ nav:
   - Getting started: getting-started.md
   - First baseline: baseline.md
   - Encoder training: encoder-training.md
+  - Kaggle training: kaggle-training.md
   - Dataset card: dataset-card.md
   - Model cards:
       - Overview: model-cards/index.md
