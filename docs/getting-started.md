@@ -4,9 +4,10 @@ Install Git and uv, then clone the GitHub repository and open its root folder.
 The locked environment uses Python 3.11. uv can install that interpreter.
 
 ```sh
-uv sync --frozen --group data --group dev
+uv sync --frozen --group data --group dev --group training
 ```
 
+The training group adds the encoder libraries and CodeCarbon.
 The data group includes Great Expectations and Deepchecks. Keep the frozen
 lockfile rather than updating libraries during reproduction. PyNBLint requires
 Typer 0.12.5 and Click 8.1.8. Deepchecks requires the pinned scientific stack and

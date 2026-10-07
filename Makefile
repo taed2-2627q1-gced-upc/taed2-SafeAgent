@@ -7,7 +7,7 @@ help:
 
 ## Install the locked environment
 requirements:
-	uv sync --frozen --group data --group dev
+	uv sync --frozen --group data --group dev --group training
 
 ## Download and check the pinned source
 fetch:
