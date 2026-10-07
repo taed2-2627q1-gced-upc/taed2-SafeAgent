@@ -12,14 +12,31 @@ and configure DVC, then run from the repository root:
 ```sh
 uv run --frozen --group data dvc pull
 uv run --frozen --group data dvc repro
-uv run --frozen --group data python -m taed2_safeagent.modeling.train --params params.yaml
-uv run --frozen --group data python -m taed2_safeagent.modeling.evaluate --params params.yaml
 ```
 
 Training fits the vocabulary and classifier on the 26,660 training examples.
 Evaluation loads that fitted pipeline and predicts the 3,333 validation examples.
 The 3,332 test examples stay reserved for the final comparison. There is no
 parameter search in this run.
+
+DVC runs audit, prepare and validate before train and evaluate. The model stage
+depends on the quality report, prepared training data, source code, locked
+environment and baseline settings. Evaluation depends on the saved model and
+validation data. A failed stage stops the following stages.
+
+Current stages are skipped, so a normal reproduction can recover or reuse the
+saved model. Metadata keeps the code and fit details from the run that produced
+that version. To force a new fit without rerunning the data stages:
+
+```sh
+uv run --frozen --group data dvc repro --force --single-item train
+uv run --frozen --group data dvc repro evaluate
+```
+
+For a quick development run, the Python train and evaluate commands remain
+available. A new fit clears the old shared run receipt. After running both
+commands directly, record their outputs with dvc commit --force train evaluate.
+Normal pipeline runs record outputs automatically.
 
 The baseline settings are in params.yaml. Character lengths are 2 to 5 and
 features preserve case, repeated spaces and punctuation. The vocabulary has a
@@ -33,7 +50,7 @@ checks the saved data identity and rejects overlapping IDs or groups.
 
 ## Record an experiment
 
-The separate training and evaluation commands work locally. To record a real
+The DVC stages and separate Python commands work locally. To record a real
 shared run, set MLFLOW_TRACKING_USERNAME to the personal DagsHub username and
 MLFLOW_TRACKING_PASSWORD to the personal access token. Use the local environment
 or an ignored .env file, and keep the values out of Git and command history.
@@ -49,11 +66,13 @@ uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --par
 The command requires a clean Git checkout. It trains the fixed baseline and
 evaluates validation, then saves the run identity in model metadata and uploads
 the new model version with DVC. MLflow receives settings, metrics, class results,
-raw and normalized confusion matrices, prepared ID predictions and the model
-pointer. The model binary stays in DVC.
+raw and normalized confusion matrices, prepared ID predictions and the input and
+output DVC locks. The model binary stays in DVC, owned by the train stage.
+The command records the stages after actually running training and evaluation,
+then uploads the new model. Cached reproduction creates no shared run.
 
 After successful logging, the run link and version details are saved in
-reports/baseline/mlflow_run.json. Review and commit the updated pointer and receipt
+reports/baseline/mlflow_run.json. Review and commit the updated lock and receipt
 afterward. The receipt records the code used during training, separately from
 the later commit containing generated results.
 
@@ -72,20 +91,19 @@ fallback and the command does not retry training automatically.
 | reports/baseline/predictions.jsonl | Prepared ID, true label and predicted label for each example |
 | reports/baseline/mlflow_run.json | Successful shared run link and code and model versions |
 
-The model directory is stored through its DVC pointer. The small reports are
+The model directory is stored through the train entry in dvc.lock. The small reports are
 stored in Git. dvc pull recovers the saved model, so training can be skipped when
 you only want to evaluate it. Load serialized models only from a trusted source.
 
-After standalone training, version and upload the model before committing its
-updated pointer and reports. The experiment command already performs these steps:
+After a pipeline run, upload the model before committing the updated lock and
+reports. The experiment command already performs the upload:
 
 ```sh
-uv run --frozen --group data dvc add models/tfidf_char_linear_svm
-uv run --frozen --group data dvc push models/tfidf_char_linear_svm.dvc
+uv run --frozen --group data dvc push train
 ```
 
-Training and evaluation currently use the two Python commands above. They are
-not stages in dvc.yaml yet, so dvc repro runs the data pipeline only.
+The old standalone model pointer is replaced by the train stage, so the model
+has one owner in DVC. Earlier committed versions remain available in history.
 
 ## First result
 

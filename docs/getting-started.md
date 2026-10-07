@@ -41,6 +41,8 @@ uv run --frozen --group data pytest -q
 A normal reproduction reuses the raw snapshot and valid stage outputs.
 Use dvc repro --force when checking that transformations recreate their outputs.
 Small reports belong in Git. Large artifacts use DVC.
+The pipeline also trains the command baseline and evaluates validation.
+Use dvc repro validate to prepare and check only the data.
 
 ## Recover from the public source
 
@@ -74,4 +76,4 @@ The full dataset integration test needs prepared data. Without it, that check is
 reported as skipped. CI prepares the actual snapshot before running all tests.
 PyNBLint becomes applicable when notebooks are added. Follow the
 [baseline guide](baseline.md) for local training and validation evaluation.
-The data stages do not train a model or create MLflow and CodeCarbon records.
+Normal reproduction does not create MLflow or CodeCarbon records.
