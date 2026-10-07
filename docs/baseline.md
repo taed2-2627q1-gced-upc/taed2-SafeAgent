@@ -1,6 +1,6 @@
 # First baseline
 
-We use character TF-IDF and a linear SVM as the first comparison point. This
+Character TF-IDF and a linear SVM form the first comparison point. This
 model reads the command only, so context can be added in a later experiment
 using the same examples and split. It never executes commands.
 
@@ -31,6 +31,37 @@ Only the shared command input builder supplies features. Context, labels,
 identifiers and annotation fields do not enter the vectorizer. Evaluation also
 checks the saved data identity and rejects overlapping IDs or groups.
 
+## Record an experiment
+
+The separate training and evaluation commands work locally. To record a real
+shared run, set MLFLOW_TRACKING_USERNAME to the personal DagsHub username and
+MLFLOW_TRACKING_PASSWORD to the personal access token. Use the local environment
+or an ignored .env file, and keep the values out of Git and command history.
+The URI and the shared experiment name SafeAgent are in params.yaml.
+An existing MLFLOW_TRACKING_URI must match that URI.
+
+Commit the source and settings, check that DVC inputs are current, then run:
+
+```sh
+uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --params params.yaml
+```
+
+The command requires a clean Git checkout. It trains the fixed baseline and
+evaluates validation, then saves the run identity in model metadata and uploads
+the new model version with DVC. MLflow receives settings, metrics, class results,
+raw and normalized confusion matrices, prepared ID predictions and the model
+pointer. The model binary stays in DVC.
+
+After successful logging, the run link and version details are saved in
+reports/baseline/mlflow_run.json. Review and commit the updated pointer and receipt
+afterward. The receipt records the code used during training, separately from
+the later commit containing generated results.
+
+A failed run returns an error and does not write a new success receipt. Its
+shared status is marked failed when the server is reachable. Generated files
+remain available for checking before another attempt. There is no local tracking
+fallback and the command does not retry training automatically.
+
 ## Saved files
 
 | Path | Contents |
@@ -39,13 +70,14 @@ checks the saved data identity and rejects overlapping IDs or groups.
 | models/tfidf_char_linear_svm/metadata.json | Settings, data version, code version and fit details |
 | reports/baseline/metrics.json | Validation metrics and confusion matrix |
 | reports/baseline/predictions.jsonl | Prepared ID, true label and predicted label for each example |
+| reports/baseline/mlflow_run.json | Successful shared run link and code and model versions |
 
 The model directory is stored through its DVC pointer. The small reports are
 stored in Git. dvc pull recovers the saved model, so training can be skipped when
 you only want to evaluate it. Load serialized models only from a trusted source.
 
-After a new training run, version and upload the model before committing its
-updated pointer and reports:
+After standalone training, version and upload the model before committing its
+updated pointer and reports. The experiment command already performs these steps:
 
 ```sh
 uv run --frozen --group data dvc add models/tfidf_char_linear_svm
@@ -59,10 +91,10 @@ not stages in dvc.yaml yet, so dvc repro runs the data pipeline only.
 
 The first validation run has macro F1 0.8613, accuracy 0.8623 and DENY recall
 0.8613. It predicts ALLOW for 19 of the 764 DENY examples, which is 2.49%.
-These results give us a starting point, but the data is synthetic and the model
+These results give the project a starting point, but the data is synthetic and the model
 does not use context. See the [model card](model-cards/model_card_tfidf_linear_svm.md)
 for all class results and limits.
 
-This is a local CPU baseline. Shared MLflow tracking is planned for the next PR
-and energy measurements for Milestone 3. No energy or emissions value has been
-measured for this run.
+This is a local CPU baseline. Shared tracking uses the experiment command above,
+and energy measurements remain planned for Milestone 3. No energy or emissions
+value has been measured for this run.

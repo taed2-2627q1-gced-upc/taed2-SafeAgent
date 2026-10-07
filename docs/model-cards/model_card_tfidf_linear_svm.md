@@ -27,7 +27,7 @@ The results below come from validation only. The final test is still reserved.
 
 ### Model Description
 
-We use a small classical model as a starting point for the later encoder
+The small classical model is a starting point for the later encoder
 experiments. It reads the command string only, so it can also help measure
 whether adding execution context improves the same model family.
 
@@ -161,7 +161,7 @@ must stay outside the feature input for this command baseline.
 
 #### Metrics
 
-We report accuracy, balanced accuracy, macro F1, per class precision, recall,
+The reports include accuracy, balanced accuracy, macro F1, per class precision, recall,
 F1 and support, and the confusion matrix. We also count true DENY examples
 predicted as ALLOW and divide that count by all true DENY examples.
 
@@ -240,8 +240,9 @@ Peak RAM use has not been measured.
 #### Software
 
 Python 3.11, scikit-learn 1.5.2, NumPy 1.26.4 and joblib 1.6.0, with the
-environment fixed in uv.lock. DVC stores the fitted model. Shared MLflow
-tracking is planned for the next PR and no shared run was logged here.
+environment fixed in uv.lock. DVC stores the fitted model. Shared MLflow tracking
+uses the experiment command in the [baseline guide](../baseline.md). Its receipt
+records the completed run link. Energy tracking remains planned for Milestone 3.
 
 ## Citation
 
