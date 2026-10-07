@@ -8,6 +8,7 @@ from taed2_safeagent.modeling.common import load_config
 from taed2_safeagent.modeling.evaluate import evaluate
 from taed2_safeagent.modeling.tracking import (
     check_inputs,
+    log_input_lock,
     log_results,
     mark_failed,
     save_model_version,
@@ -22,6 +23,7 @@ def run_experiment(params, root):
     root = Path(root).resolve()
     client = tracking_client(params["tracking"])
     source, lock_version = check_inputs(root)
+    input_lock = (root / "dvc.lock").read_bytes()
     seed = params["baseline"]["svm"]["random_state"]
     name = f"tfidf_char_linear_svm__command__seed{seed}"
     tags = {
@@ -64,27 +66,28 @@ def run_experiment(params, root):
         if metadata["code"] != source:
             raise ValueError("Source changed during training")
         phase = "validation"
-        metrics = evaluate(params)
         metadata["tracking"] = {
             key: receipt[key] for key in ("run_id", "experiment_id", "tracking_uri", "run_url")
         }
         write_json(params["baseline"]["model_dir"] / "metadata.json", metadata)
+        metrics = evaluate(params)
         phase = "model upload"
         typer.echo("Saving the model with DVC")
-        pointer, model_version = save_model_version(root, params["baseline"]["model_dir"])
+        lock, model_version = save_model_version(root, params["baseline"]["model_dir"])
         phase = "result logging"
         typer.echo("Recording the validation results")
         client.set_tag(receipt["run_id"], "model_dvc_version", model_version, synchronous=True)
         client.set_tag(
             receipt["run_id"],
             "model_dvc_path",
-            pointer.relative_to(root).as_posix(),
+            lock.relative_to(root).as_posix(),
             synchronous=True,
         )
+        client.set_tag(receipt["run_id"], "model_dvc_stage", "train", synchronous=True)
+        log_input_lock(client, receipt["run_id"], input_lock)
         files = (
             params["baseline"]["model_dir"] / "metadata.json",
-            pointer,
-            root / "dvc.lock",
+            lock,
             params["baseline"]["report_dir"] / "metrics.json",
             params["baseline"]["report_dir"] / "predictions.jsonl",
         )
@@ -96,7 +99,8 @@ def run_experiment(params, root):
         receipt.update(
             status="FINISHED",
             model_dvc_version=model_version,
-            model_dvc_path=pointer.relative_to(root).as_posix(),
+            model_dvc_path=lock.relative_to(root).as_posix(),
+            model_dvc_stage="train",
         )
         write_json(report, receipt)
     except (ValueError, TypeError, KeyError, OSError, RuntimeError, MlflowException):

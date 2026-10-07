@@ -4,7 +4,7 @@ SafeAgent classifies proposed shell commands as ALLOW, ASK or DENY.
 The project compares command inputs with command and execution context inputs.
 The component reads commands as text and never runs them.
 
-## Reproduce the data
+## Reproduce the project
 
 Use Python 3.11 and uv. Start with the [setup guide](docs/getting-started.md).
 It explains how to connect DVC and set up the local cache.
@@ -23,11 +23,12 @@ The [model cards](docs/model-cards/index.md) describe the classifiers and their 
 ## Train the first model
 
 The first baseline uses character TF-IDF and a linear SVM with command inputs.
-After preparing the data, run:
+The DVC pipeline checks the data, trains the model and evaluates validation.
+To run these stages separately:
 
 ```sh
-uv run --frozen --group data python -m taed2_safeagent.modeling.train --params params.yaml
-uv run --frozen --group data python -m taed2_safeagent.modeling.evaluate --params params.yaml
+uv run --frozen --group data dvc repro train
+uv run --frozen --group data dvc repro evaluate
 ```
 
 See the [baseline guide](docs/baseline.md) for recovery and output files.
@@ -45,6 +46,8 @@ uv run --frozen --group data python -m taed2_safeagent.modeling.experiment --par
 
 This trains the baseline, evaluates validation, uploads the model with DVC and
 records the run in DagsHub. The run link is saved in reports/baseline/mlflow_run.json.
+Normal DVC reproduction reuses current outputs and does not create an MLflow run.
+Use dvc repro validate when only the data is needed.
 
 ## Project layout
 
@@ -66,8 +69,7 @@ records the run in DagsHub. The run link is saved in reports/baseline/mlflow_run
 | dvc.yaml and dvc.lock | Pipeline and artifact versions |
 | pyproject.toml and uv.lock | Dependencies and locked environment |
 
-The plotting module is still a starter file. The project started from
-Cookiecutter Data Science.
+The project started from Cookiecutter Data Science.
 
 ## Quality checks
 
@@ -79,7 +81,7 @@ uv run --frozen --group data mkdocs build --strict
 
 GitHub Actions runs data and small model tests in one job. It downloads the
 public pinned snapshot and does not need personal DagsHub credentials.
-PyNBLint is installed, but there are no notebooks to check yet. Tracking tests
+PyNBLint is installed for notebook checks when notebooks are available. Tracking tests
 use a fake client, so CI needs no DagsHub credentials. CodeCarbon measurements
 remain planned for Milestone 3.
 

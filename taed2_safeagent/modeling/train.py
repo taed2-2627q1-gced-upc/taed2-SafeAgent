@@ -61,6 +61,7 @@ def train(params):
         "versions": {name: version(name) for name in ("scikit-learn", "numpy", "joblib")},
     }
     directory = settings["model_dir"]
+    (settings["report_dir"] / "mlflow_run.json").unlink(missing_ok=True)
     directory.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, directory / "pipeline.joblib", compress=3)
     write_json(directory / "metadata.json", metadata)

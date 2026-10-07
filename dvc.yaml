@@ -79,3 +79,67 @@ stages:
     metrics:
       - reports/data/validation.json:
           cache: false
+  train:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train --params params.yaml
+    deps:
+      - ${paths.processed}/train.jsonl
+      - ${paths.processed}/manifest.json
+      - reports/data/validation.json
+      - taed2_safeagent/modeling/train.py
+      - taed2_safeagent/config.py
+      - taed2_safeagent/modeling/common.py
+      - taed2_safeagent/modeling/__init__.py
+      - taed2_safeagent/features.py
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/__init__.py
+      - pyproject.toml
+      - uv.lock
+    params:
+      - source
+      - context
+      - grouping
+      - split
+      - paths.processed
+      - baseline.input_mode
+      - baseline.model_dir
+      - baseline.report_dir
+      - baseline.tfidf
+      - baseline.svm
+    outs:
+      - ${baseline.model_dir}
+  evaluate:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.evaluate --params params.yaml
+    deps:
+      - ${baseline.model_dir}
+      - ${paths.processed}/train.jsonl
+      - ${paths.processed}/validation.jsonl
+      - ${paths.processed}/manifest.json
+      - reports/data/validation.json
+      - taed2_safeagent/modeling/evaluate.py
+      - taed2_safeagent/config.py
+      - taed2_safeagent/modeling/common.py
+      - taed2_safeagent/modeling/__init__.py
+      - taed2_safeagent/features.py
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/__init__.py
+      - pyproject.toml
+      - uv.lock
+    params:
+      - source
+      - context
+      - grouping
+      - split
+      - paths.processed
+      - baseline.input_mode
+      - baseline.model_dir
+      - baseline.report_dir
+    metrics:
+      - ${baseline.report_dir}/metrics.json:
+          cache: false
+    outs:
+      - ${baseline.report_dir}/predictions.jsonl:
+          cache: false
