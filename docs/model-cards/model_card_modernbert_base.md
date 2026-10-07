@@ -119,7 +119,14 @@ from taed2_safeagent.data.inputs import build_input
 
 model_path = "models/encoders/modernbert__command-context__2__a740d875"
 classifier = pipeline("text-classification", model=model_path, tokenizer=model_path)
-example = {"command": "git status", "context": {}}
+example = {
+    "command": "git status",
+    "context": {
+        "gitRemote": None,
+        "gitStatus": {"untracked": [], "modified": [], "staged": []},
+        "agentTouchedFiles": [],
+    },
+}
 text = build_input(example, "command-context")
 result = classifier(text, truncation=True, max_length=512)[0]
 print(result)
