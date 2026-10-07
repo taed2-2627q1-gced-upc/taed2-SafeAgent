@@ -8,6 +8,7 @@ from taed2_safeagent.modeling.common import load_config
 from taed2_safeagent.modeling.evaluate import evaluate
 from taed2_safeagent.modeling.tracking import (
     check_inputs,
+    log_input_lock,
     log_results,
     mark_failed,
     save_model_version,
@@ -22,7 +23,7 @@ def run_experiment(params, root):
     root = Path(root).resolve()
     client = tracking_client(params["tracking"])
     source, lock_version = check_inputs(root)
-    input_lock = (root / "dvc.lock").read_text(encoding="utf-8")
+    input_lock = (root / "dvc.lock").read_bytes()
     seed = params["baseline"]["svm"]["random_state"]
     name = f"tfidf_char_linear_svm__command__seed{seed}"
     tags = {
@@ -83,7 +84,7 @@ def run_experiment(params, root):
             synchronous=True,
         )
         client.set_tag(receipt["run_id"], "model_dvc_stage", "train", synchronous=True)
-        client.log_text(receipt["run_id"], input_lock, "input_dvc.lock")
+        log_input_lock(client, receipt["run_id"], input_lock)
         files = (
             params["baseline"]["model_dir"] / "metadata.json",
             lock,

@@ -2,8 +2,10 @@ import hashlib
 from importlib.metadata import version
 import json
 import os
+from pathlib import Path
 import subprocess
 import sys
+from tempfile import TemporaryDirectory
 from time import time
 from urllib.parse import urlsplit
 
@@ -73,6 +75,13 @@ def save_model_version(root, directory):
         raise ValueError("Missing trained model version in dvc.lock")
     dvc_command(root, "push", "train")
     return lock, versions[0]
+
+
+def log_input_lock(client, run_id, content):
+    with TemporaryDirectory(prefix="safeagent-input-") as directory:
+        lock = Path(directory) / "input_dvc.lock"
+        lock.write_bytes(content)
+        client.log_artifact(run_id, str(lock))
 
 
 def metric_values(metadata, metrics):

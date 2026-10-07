@@ -91,7 +91,6 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     ]
     assert result["model_dvc_path"] == "dvc.lock"
     assert result["model_dvc_stage"] == "train"
-    client.log_text.assert_called_once_with("run42", "stages: {}\n", "input_dvc.lock")
     model = tracked_run.params["baseline"]["model_dir"]
     metadata = json.loads((model / "metadata.json").read_text(encoding="utf-8"))
     metrics = json.loads(
@@ -109,6 +108,7 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     assert settings["input_mode"] == "command"
     artifacts = {Path(call.args[1]).name for call in client.log_artifact.call_args_list}
     assert artifacts == {
+        "input_dvc.lock",
         "metadata.json",
         "dvc.lock",
         "metrics.json",
@@ -121,6 +121,19 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     assert normalized["labels"] == ["ALLOW", "ASK", "DENY"]
     assert all(sum(row) == pytest.approx(1) for row in normalized["counts"])
     client.set_terminated.assert_called_once_with("run42", status="FINISHED")
+
+
+@pytest.mark.parametrize("content", [b"stages: {}\n", b"stages: {}\r\n"])
+def test_input_lock_artifact_preserves_recorded_bytes(content):
+    client = Mock(spec=MlflowClient)
+    uploaded = []
+
+    def capture(_run_id, path):
+        uploaded.append(Path(path).read_bytes())
+
+    client.log_artifact.side_effect = capture
+    tracking.log_input_lock(client, "run42", content)
+    assert uploaded == [content]
 
 
 @pytest.mark.parametrize("variable", ["MLFLOW_TRACKING_USERNAME", "MLFLOW_TRACKING_PASSWORD"])
