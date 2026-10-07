@@ -13,9 +13,10 @@ recovery, DVC reproduction and quality checks.
 ## Model cards
 
 The [model cards](model-cards/index.md) document the three classifiers and their
-limits. The first TF-IDF and SVM baseline has validation results, while the
-transformer cards still describe planned work. See the [baseline guide](baseline.md)
-to train or recover the first model and evaluate it.
+limits. The baseline and both transformer families have validation results,
+and the transformer cards include paired command and context runs from Kaggle.
+See the [baseline guide](baseline.md) and [encoder guide](encoder-training.md)
+to train or recover the models.
 
 ## Project setup
 
