@@ -7,7 +7,7 @@ The component reads commands as text and never runs them.
 ## Reproduce the data
 
 Use Python 3.11 and uv. Start with the [setup guide](docs/getting-started.md).
-It includes local DVC credentials and the Windows cache setting.
+It explains how to connect DVC and set up the local cache.
 
 ```sh
 uv sync --frozen --group data --group dev
@@ -48,10 +48,10 @@ uv run --frozen --group data pytest -q
 uv run --frozen --group data mkdocs build --strict
 ```
 
-GitHub Actions runs the data checks on Windows and Ubuntu. It downloads the
+GitHub Actions runs the data checks. It downloads the
 public pinned snapshot and does not need personal DagsHub credentials.
 PyNBLint is installed, but there are no notebooks to check yet. MLflow and
 CodeCarbon measurements will be added with real model training.
 
 Use make help for optional convenience commands. The uv commands also work
-without make on Windows.
+without make.
