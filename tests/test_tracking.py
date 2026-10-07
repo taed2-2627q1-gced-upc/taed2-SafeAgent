@@ -1,3 +1,4 @@
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -7,6 +8,8 @@ from unittest.mock import Mock
 
 from mlflow import MlflowClient
 from mlflow.exceptions import MlflowException
+from mlflow.store.tracking.rest_store import RestStore
+from mlflow.tracking._tracking_service.client import TrackingServiceClient
 import pytest
 from typer.testing import CliRunner
 
@@ -247,3 +250,18 @@ def test_dvc_failure_uses_project_python_and_redacts_output(tmp_path, monkeypatc
         "models/baseline.dvc",
     ]
     assert execute.call_args.kwargs["cwd"] == tmp_path
+
+
+def test_sdk_completion_works_with_plain_text_output(tracked_run, monkeypatch):
+    tracking.tracking_client(tracked_run.params["tracking"])
+    store = Mock(spec=RestStore)
+    monkeypatch.setattr(TrackingServiceClient, "store", property(lambda _self: store))
+    client = MlflowClient(tracking_uri=tracked_run.params["tracking"]["uri"])
+    with (
+        io.TextIOWrapper(io.BytesIO(), encoding="ascii") as output,
+        monkeypatch.context() as scoped,
+    ):
+        scoped.setattr(sys, "stdout", output)
+        client.set_terminated("run42", status="FINISHED")
+    store.update_run_info.assert_called_once()
+    store.get_run.assert_not_called()

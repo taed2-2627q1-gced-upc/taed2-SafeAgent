@@ -37,6 +37,7 @@ def tracking_client(settings):
         raise ValueError("Missing experiment name")
     os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "0")
     os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", "30")
+    os.environ["MLFLOW_SUPPRESS_PRINTING_URL_TO_STDOUT"] = "true"
     return MlflowClient(tracking_uri=uri)
 
 
