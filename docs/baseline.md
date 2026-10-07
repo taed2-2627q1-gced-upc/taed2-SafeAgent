@@ -89,7 +89,8 @@ not stages in dvc.yaml yet, so dvc repro runs the data pipeline only.
 
 ## First result
 
-The first validation run has macro F1 0.8613, accuracy 0.8623 and DENY recall
+The [recorded validation run](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/1b2eb37037e34d82ad87c5ba86613c99)
+has macro F1 0.8613, accuracy 0.8623 and DENY recall
 0.8613. It predicts ALLOW for 19 of the 764 DENY examples, which is 2.49%.
 These results give the project a starting point, but the data is synthetic and the model
 does not use context. See the [model card](model-cards/model_card_tfidf_linear_svm.md)
