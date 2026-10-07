@@ -4,6 +4,12 @@ SafeAgent classifies shell commands proposed by AI coding agents as `ALLOW`,
 `ASK`, or `DENY`. The project compares command-only models with a model that
 also uses execution context.
 
+## Data
+
+The [Dataset Card](dataset-card.md) explains the source audit, strict group split
+and shared input formats. See [getting started](getting-started.md) for data
+recovery, DVC reproduction and quality checks.
+
 ## Model cards
 
 The [model cards](model-cards/index.md) document the three planned classifiers,

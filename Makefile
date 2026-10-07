@@ -1,83 +1,32 @@
-#################################################################################
-# GLOBALS                                                                       #
-#################################################################################
-
-PROJECT_NAME = taed2-SafeAgent
-PYTHON_VERSION = 3.11
-PYTHON_INTERPRETER = python
-
-#################################################################################
-# COMMANDS                                                                      #
-#################################################################################
-
-
-## Install Python dependencies
-.PHONY: requirements
-requirements:
-	uv sync
-	
-
-
-
-## Delete all compiled Python files
-.PHONY: clean
-clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-
-
-## Lint using ruff (use `make format` to do formatting)
-.PHONY: lint
-lint:
-	ruff format --check
-	ruff check
-
-## Format source code with ruff
-.PHONY: format
-format:
-	ruff check --fix
-	ruff format
-
-
-
-
-
-## Set up Python interpreter environment
-.PHONY: create_environment
-create_environment:
-	uv venv --python $(PYTHON_VERSION)
-	@echo ">>> New uv virtual environment created. Activate with:"
-	@echo ">>> Windows: .\\\\.venv\\\\Scripts\\\\activate"
-	@echo ">>> Unix/macOS: source ./.venv/bin/activate"
-	
-
-
-
-#################################################################################
-# PROJECT RULES                                                                 #
-#################################################################################
-
-
-## Make dataset
-.PHONY: data
-data: requirements
-	$(PYTHON_INTERPRETER) taed2_safeagent/dataset.py
-
-
-#################################################################################
-# Self Documenting Commands                                                     #
-#################################################################################
-
 .DEFAULT_GOAL := help
 
-define PRINT_HELP_PYSCRIPT
-import re, sys; \
-lines = '\n'.join([line for line in sys.stdin]); \
-matches = re.findall(r'\n## (.*)\n[\s\S]+?\n([a-zA-Z_-]+):', lines); \
-print('Available rules:\n'); \
-print('\n'.join(['{:25}{}'.format(*reversed(match)) for match in matches]))
-endef
-export PRINT_HELP_PYSCRIPT
+.PHONY: help requirements fetch data test lint docs
 
 help:
-	@$(PYTHON_INTERPRETER) -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
+	@echo "Targets: requirements fetch data test lint docs"
+
+## Install the locked environment
+requirements:
+	uv sync --frozen --group data --group dev
+
+## Download and check the pinned source
+fetch:
+	uv run --frozen --group data python -m taed2_safeagent.dataset fetch
+
+## Reproduce the data pipeline
+data:
+	uv run --frozen --group data dvc repro
+
+## Check data behavior
+test:
+	uv run --frozen --group data pytest -q
+
+## Check changed Python code
+lint:
+	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py tests
+	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py tests
+	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py tests
+
+## Build public docs
+docs:
+	uv run --frozen --group data mkdocs build --strict

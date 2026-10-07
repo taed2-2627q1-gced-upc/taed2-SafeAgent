@@ -1,75 +1,57 @@
-# taed2-SafeAgent
+# SafeAgent
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+SafeAgent classifies proposed shell commands as ALLOW, ASK or DENY.
+We compare command inputs with command and execution context inputs.
+The component reads commands as text and never runs them.
 
-SafeAgent is an ML component that classifies shell commands proposed by AI coding agents as ALLOW, ASK, or DENY, exploring whether execution context improves risk classification while applying reproducible MLOps practices with DVC and MLflow.
+## Reproduce the data
 
-## Model Cards
-
-The [model cards](docs/model-cards/index.md) describe the planned
-classifiers, intended uses, limitations, and evaluation criteria. Training
-results will be added after reproducible runs are available.
-
-## Project Organization
-
-```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
-├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
-│
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
-│
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
-│
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         taed2_safeagent and configuration for tools like black
-│
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-│
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-├── setup.cfg          <- Configuration file for flake8
-│
-└── taed2_safeagent   <- Source code for use in this project.
-    │
-    ├── __init__.py             <- Makes taed2_safeagent a Python module
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── dataset.py              <- Scripts to download or generate data
-    │
-    ├── features.py             <- Code to create features for modeling
-    │
-    ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
-    │
-    └── plots.py                <- Code to create visualizations
-```
-
-## Documentation
-
-The documentation pages live in [`docs/`](docs/index.md). From the repository
-root, build or serve the MkDocs site with:
+Use Python 3.11 and uv. Start with the [setup guide](docs/getting-started.md).
+It includes local DVC credentials and the Windows cache setting.
 
 ```sh
-uv run mkdocs build
-uv run mkdocs serve
+uv sync --frozen --group data --group dev
+uv run --frozen --group data dvc pull
+uv run --frozen --group data dvc repro
+uv run --frozen --group data pytest -q
 ```
 
+The [Dataset Card](docs/dataset-card.md) explains the pinned source, cleaning,
+group split, input formats, checks and known limits.
+The [model cards](docs/model-cards/index.md) describe the planned classifiers.
+Training results are pending.
+
+## Project layout
+
+| Folder or file | Contents |
+| --- | --- |
+| taed2_safeagent/data | Source checks, audit, groups, splits, validation and input builder |
+| taed2_safeagent/dataset.py | Data command line interface |
+| data/raw/shell_safety | Immutable source snapshot stored with DVC |
+| data/interim/shell_safety | Clean inputs, provenance and quarantine stored with DVC |
+| data/processed/shell_safety | Prepared splits and manifest stored with DVC |
+| reports/data | Small deterministic audit, split and validation reports |
+| tests | Data behavior and integrity tests |
+| docs | Public setup guide, Dataset Card and model cards |
+| params.yaml | Source hashes and fixed data protocol |
+| dvc.yaml and dvc.lock | Pipeline and artifact versions |
+| pyproject.toml and uv.lock | Dependencies and locked environment |
+
+The remaining model and plotting modules are starter files. They do not train
+or evaluate a model yet. The project started from Cookiecutter Data Science.
+
+## Quality checks
+
+```sh
+uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py tests
+uv run --frozen --group data pytest -q
+uv run --frozen --group data mkdocs build --strict
+```
+
+GitHub Actions runs the data checks on Windows and Ubuntu. It downloads the
+public pinned snapshot and does not need personal DagsHub credentials.
+PyNBLint is installed, but there are no notebooks to check yet. MLflow and
+CodeCarbon measurements will be added with real model training.
+
+Use make help for optional convenience commands. The uv commands also work
+without make on Windows.
