@@ -4,6 +4,7 @@ docs_dir: docs
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - First baseline: baseline.md
   - Dataset card: dataset-card.md
   - Model cards:
       - Overview: model-cards/index.md
