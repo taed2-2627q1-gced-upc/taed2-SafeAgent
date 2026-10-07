@@ -54,3 +54,10 @@ def data_bundle(params, raw_row):
     audit(params)
     prepare(params)
     return params
+
+
+@pytest.fixture(name="baseline_params")
+def baseline_settings(bundle, tmp_path):
+    bundle["baseline"]["model_dir"] = tmp_path / "models" / "baseline"
+    bundle["baseline"]["report_dir"] = tmp_path / "reports" / "baseline"
+    return bundle

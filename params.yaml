@@ -42,3 +42,20 @@ validation:
   expected_duplicate_rows: 680
   expected_quarantine_rows: 2
   require_ambiguous_commands: true
+baseline:
+  input_mode: command
+  model_dir: models/tfidf_char_linear_svm
+  report_dir: reports/baseline
+  tfidf:
+    ngram_range: [2, 5]
+    min_df: 2
+    max_features: 100000
+    sublinear_tf: true
+    norm: l2
+  svm:
+    C: 1.0
+    class_weight: balanced
+    random_state: 42
+    dual: auto
+    tol: 0.0001
+    max_iter: 10000
