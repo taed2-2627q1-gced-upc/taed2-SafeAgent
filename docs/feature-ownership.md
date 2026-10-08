@@ -1,123 +1,117 @@
 # Feature ownership
 
-## Propósito
+## Purpose
 
-El *feature ownership* define quién mantiene cada parte de SafeAgent y quién
-realiza una segunda revisión antes de integrar cambios. El owner principal
-coordina el mantenimiento de su feature, comprueba que los cambios incluyen
-tests adecuados, mantiene su documentación y atiende las revisiones de los pull
-requests. El reviewer aporta una revisión independiente y comprueba especialmente
-los contratos y riesgos propios de esa feature.
+Feature ownership defines who maintains each part of SafeAgent and who provides
+an independent review before changes are merged. The primary owner coordinates
+feature maintenance, ensures that changes include appropriate tests, keeps the
+documentation up to date, and addresses pull request feedback. The secondary
+reviewer provides an independent review, with particular attention to the
+feature's contracts and risks.
 
-Las asignaciones reflejan el estado visible del repositorio. El proyecto sigue
-la organización de Cookiecutter Data Science, con datos versionados mediante
-DVC, código bajo `taed2_safeagent/`, tests en `tests/` y documentación en
-`docs/`. Los estados indican implementación observada, no una fecha de entrega.
+These assignments reflect the repository's current state. The project follows
+the Cookiecutter Data Science layout, with data versioned through DVC, code in
+`taed2_safeagent/`, tests in `tests/`, and documentation in `docs/`. Status
+describes observed implementation, not a delivery date.
 
-## Resumen de asignaciones
+## Assignment summary
 
-| Feature / módulo | Componentes / archivos clave | Owner principal | Reviewer | Estado / milestone |
+| Feature / module | Key components / files | Primary owner | Reviewer | Status / milestone |
 | --- | --- | --- | --- | --- |
-| Ingesta del dataset fijado y auditoría de origen | `data/raw/shell_safety.dvc`, `taed2_safeagent/data/source.py`, `taed2_safeagent/data/audit.py`, `params.yaml` (`source`), `tests/test_source.py`, `tests/test_audit.py` | David González | Joel Márquez | Implementado: snapshot fijado, verificación de hash y auditoría |
-| Agrupación, split y prevención de data leakage | `taed2_safeagent/data/grouping.py`, `taed2_safeagent/data/split.py`, `params.yaml` (`grouping`, `split`), `tests/test_grouping.py` | Joel Márquez | Pau González | Implementado: split por grupos train/validation/test |
-| Contratos y validación de datos | `taed2_safeagent/data/inputs.py`, `taed2_safeagent/data/validation.py`, `taed2_safeagent/dataset.py`, `reports/data/`, `tests/test_validation.py` | Pau González | Pau Balaguer | Implementado: controles de filas, etiquetas, duplicados y cuarentena |
-| Extracción de features y contexto de ejecución | `taed2_safeagent/features.py`, `taed2_safeagent/data/inputs.py`, `params.yaml` (`context`, `baseline.tfidf`), `tests/test_baseline.py` | Pau Balaguer | David González | Implementado: TF-IDF con n-gramas de caracteres y entrada `command-context`; n-gramas de palabra no observados |
-| Baseline y pipeline DVC | `taed2_safeagent/modeling/train.py`, `taed2_safeagent/modeling/evaluate.py`, `dvc.yaml`, `dvc.lock`, `params.yaml` (`baseline`), `tests/test_baseline.py`, `tests/test_model_pipeline.py` | David González | Pau González | Implementado: SVM lineal; Logistic Regression no forma parte del baseline actual |
-| Experimentos, encoders y tracking | `taed2_safeagent/modeling/encoder.py`, `experiment.py`, `tracking.py`, `register.py`, `params.yaml` (`tracking`, `encoders`), `docs/encoder-training.md`, `tests/test_encoder.py`, `tests/test_tracking.py`, `tests/test_registration.py` | Pau Balaguer | Joel Márquez | Implementado: MLflow en DagsHub, entrenamiento/registro de encoders |
-| Quality assurance y sostenibilidad | `tests/`, `notebooks/kaggle_baseline.ipynb`, `.github/workflows/data.yml`, `pyproject.toml`, `Makefile`, `taed2_safeagent/modeling/energy.py`, informes de energía de `reports/` | Joel Márquez | David González | Implementado parcialmente: pytest, Ruff, Pylint, CI y CodeCarbon; PyNBLint está en dependencias, pero no se ejecuta en el workflow |
-| Serving y despliegue | Diseño pendiente para `taed2_safeagent/` y documentación de despliegue | Pau González | Pau Balaguer | Pendiente: no se encuentran API FastAPI, schemas Pydantic, endpoints ALLOW/ASK/DENY ni configuración de Virtech en el código actual |
+| Pinned dataset ingestion and source audit | `data/raw/shell_safety.dvc`, `taed2_safeagent/data/source.py`, `taed2_safeagent/data/audit.py`, `params.yaml` (`source`), `tests/test_source.py`, `tests/test_audit.py` | David González | Joel Márquez | Implemented: pinned snapshot, hash verification, and audit |
+| Grouping, split, and data leakage prevention | `taed2_safeagent/data/grouping.py`, `taed2_safeagent/data/split.py`, `params.yaml` (`grouping`, `split`), `tests/test_grouping.py` | Joel Márquez | Pau González | Implemented: group-based train/validation/test split |
+| Data contracts and validation | `taed2_safeagent/data/inputs.py`, `taed2_safeagent/data/validation.py`, `taed2_safeagent/dataset.py`, `reports/data/`, `tests/test_validation.py` | Pau González | Pau Balaguer | Implemented: row, label, duplicate, and quarantine checks |
+| Feature extraction and execution context | `taed2_safeagent/features.py`, `taed2_safeagent/data/inputs.py`, `params.yaml` (`context`, `baseline.tfidf`), `tests/test_baseline.py` | Pau Balaguer | David González | Implemented: character n-gram TF-IDF and `command-context` input; word n-grams are not currently present |
+| Baseline modeling and DVC pipeline | `taed2_safeagent/modeling/train.py`, `taed2_safeagent/modeling/evaluate.py`, `dvc.yaml`, `dvc.lock`, `params.yaml` (`baseline`), `tests/test_baseline.py`, `tests/test_model_pipeline.py` | David González | Pau González | Implemented: linear SVM; Logistic Regression is not part of the current baseline |
+| Experiments, encoders, and tracking | `taed2_safeagent/modeling/encoder.py`, `experiment.py`, `tracking.py`, `register.py`, `params.yaml` (`tracking`, `encoders`), `docs/encoder-training.md`, `tests/test_encoder.py`, `tests/test_tracking.py`, `tests/test_registration.py` | Pau Balaguer | Joel Márquez | Implemented: MLflow on DagsHub, encoder training and registration |
+| Quality assurance and sustainability | `tests/`, `notebooks/kaggle_baseline.ipynb`, `.github/workflows/data.yml`, `pyproject.toml`, `Makefile`, `taed2_safeagent/modeling/energy.py`, energy reports in `reports/` | Joel Márquez | David González | Partially implemented: pytest, Ruff, Pylint, CI, and CodeCarbon; PyNBLint is a dependency but is not run in the workflow |
+| Serving and deployment | Future design for `taed2_safeagent/` and deployment documentation | Pau González | Pau Balaguer | Pending: no FastAPI API, Pydantic schemas, ALLOW/ASK/DENY inference endpoints, or Virtech deployment configuration are present in the current code |
 
-No se considera que una dependencia aparezca en `uv.lock` como prueba de que
-una funcionalidad esté integrada: los estados se basan en código, configuración
-del proyecto, pipeline y documentación operativa.
-En particular, `params.yaml` fija actualmente la fuente
-`tomngdev/shell-safety-v1.1`; no está configurada como `shell-safety-v2`.
+A dependency listed in `uv.lock` is not, by itself, evidence that a feature has
+been integrated. Status is based on the code, project configuration, pipeline,
+and operational documentation. In particular, `params.yaml` currently pins
+`tomngdev/shell-safety-v1.1`; it is not configured to use `shell-safety-v2`.
 
-## Responsabilidades por integrante
+## Responsibilities by team member
 
 ### David González
 
-- **Ingesta y auditoría de datos:** mantener la descarga reproducible del
-  snapshot fijado, sus hashes y conteos; conservar procedencia, deduplicación y
-  cuarentena. En el informe, presentar la identidad de la fuente, el resultado
-  de la auditoría y los límites conocidos del dataset.
-- **Baseline y pipeline DVC:** mantener el entrenamiento/evaluación de
-  referencia y las dependencias de sus stages. En el informe, registrar
-  parámetros, métricas de validation, errores relevantes —en particular
-  `DENY` predicho como `ALLOW`— y la versión de datos/modelo.
+- **Data ingestion and audit:** Maintain reproducible retrieval of the pinned
+  snapshot, its hashes and counts, provenance, deduplication, and quarantine.
+  For the report, present the source identity, audit results, and known dataset
+  limitations.
+- **Baseline and DVC pipeline:** Maintain baseline training and evaluation and
+  the dependencies of their stages. For the report, record parameters,
+  validation metrics, relevant errors — especially `DENY` predictions labeled
+  as `ALLOW` — and the data and model versions.
 
 ### Joel Márquez
 
-- **Agrupación, split y prevención de leakage:** mantener las reglas de
-  fingerprints, similitud y asignación por grupos; verificar que los grupos no
-  cruzan particiones. En el informe, justificar el protocolo, semilla,
-  proporciones y diagnósticos del split.
-- **Quality assurance y sostenibilidad:** cuidar tests, lint, CI y las
-  mediciones CodeCarbon disponibles. En el informe, documentar qué checks se
-  ejecutaron, resultados, cobertura de CI y las limitaciones/incertidumbre de
-  las estimaciones energéticas.
+- **Grouping, split, and leakage prevention:** Maintain fingerprinting,
+  similarity, and group assignment rules; verify that groups do not cross
+  partitions. For the report, explain the protocol, seed, ratios, and split
+  diagnostics.
+- **Quality assurance and sustainability:** Maintain tests, linting, CI, and
+  available CodeCarbon measurements. For the report, document which checks ran,
+  their results, CI coverage, and the limitations and uncertainty of energy
+  estimates.
 
 ### Pau Balaguer
 
-- **Extracción de features y contexto:** mantener la vectorización por
-  caracteres y la construcción de entradas `command` y `command-context`.
-  En el informe, describir el preprocesamiento y comparar los modos de entrada;
-  cualquier experimento con n-gramas de palabra debe identificarse como una
-  ampliación, no como comportamiento actual.
-- **Experimentos, encoders y tracking:** mantener la reproducción, metadatos y
-  registro de experimentos. En el informe, comparar los modelos y modos de
-  entrada con el mismo split, y conservar la procedencia de código, datos y
-  resultados.
+- **Feature extraction and context:** Maintain character vectorization and the
+  `command` and `command-context` input builders. For the report, describe
+  preprocessing and compare the input modes; identify any word n-gram
+  experiment as an extension, not as current behavior.
+- **Experiments, encoders, and tracking:** Maintain experiment reproducibility,
+  metadata, and registration. For the report, compare models and input modes
+  using the same split, and preserve the provenance of code, data, and results.
 
 ### Pau González
 
-- **Contratos y validación de datos:** mantener la validación de los ejemplos
-  preparados y sus reportes. En el informe, explicar los invariantes, conteos
-  esperados, filas duplicadas/cuarentenadas y limitaciones del contrato.
-- **Serving y despliegue:** liderar el diseño futuro de una API y su despliegue.
-  Antes de marcar esta feature como implementada, definir schemas, validación de
-  request/response, comportamiento seguro para `ALLOW`/`ASK`/`DENY`, pruebas de
-  inferencia y una estrategia verificable de despliegue en Virtech. No se debe
-  asumir que estos componentes ya existen.
+- **Data contracts and validation:** Maintain validation of prepared examples
+  and their reports. For the report, explain invariants, expected counts,
+  duplicate and quarantined rows, and contract limitations.
+- **Serving and deployment:** Lead the future API and deployment design. Before
+  marking this feature as implemented, define schemas, request/response
+  validation, safe behavior for `ALLOW`/`ASK`/`DENY`, inference tests, and a
+  verifiable deployment strategy for Virtech. Do not assume these components
+  already exist.
 
-## Protocolo de Pull Requests y ownership
+## Pull request and ownership protocol
 
-### Siete reglas de commit
+### Seven commit rules
 
-El repositorio no contiene una lista anterior de siete reglas de commit. Para
-evitar atribuirle normas no documentadas, esta sección fija un protocolo
-alineado con el historial, la configuración y las prácticas de reproducción
-actuales:
+The repository does not contain a previously documented list of seven commit
+rules. To avoid attributing undocumented rules to the project, this section
+formalizes a protocol aligned with the commit history, configuration, and
+current reproduction practices:
 
-1. Trabajar en ramas con nombre descriptivo: `feature/<nombre>` para cambios
-   funcionales y `docs/<nombre>` para cambios documentales.
-2. Mantener cada commit centrado en un único cambio lógico; no mezclar una
-   feature no relacionada con limpieza o resultados ajenos.
-3. Usar mensajes de commit tipo Conventional Commits, por ejemplo
-   `feat(model): ...`, `fix(data): ...`, `test: ...`, `docs: ...` o `chore: ...`.
-4. No añadir credenciales, tokens ni secretos al repositorio ni a los mensajes
-   de commit; usar variables de entorno o configuración local ignorada por Git.
-5. No modificar manualmente la fuente raw fijada. Un cambio de fuente requiere
-   actualizar explícitamente revisión, hashes, conteos y protocolo de datos.
-6. Versionar los artefactos grandes con DVC y revisar los cambios de
-   `dvc.lock`/punteros; mantener en Git los reportes pequeños previstos por el
-   proyecto.
-7. Antes de solicitar integración, ejecutar los tests y checks pertinentes.
-   Para cambios de código, usar pytest, Ruff y Pylint; para cambios
-   documentales, comprobar `mkdocs build --strict`.
+1. Use descriptive branch names: `feature/<name>` for functional changes and
+   `docs/<name>` for documentation changes.
+2. Keep each commit focused on one logical change; do not mix unrelated feature
+   work with cleanup or unrelated results.
+3. Use Conventional Commit-style messages, for example `feat(model): ...`,
+   `fix(data): ...`, `test: ...`, `docs: ...`, or `chore: ...`.
+4. Never add credentials, tokens, or secrets to the repository or commit
+   messages; use environment variables or Git-ignored local configuration.
+5. Do not manually modify the pinned raw source. A source update requires
+   explicit changes to the revision, hashes, counts, and data protocol.
+6. Version large artifacts with DVC and review changes to `dvc.lock` and DVC
+   pointers; keep the small reports intended for Git under version control.
+7. Run the relevant tests and checks before requesting a merge. For code
+   changes, run pytest, Ruff, and Pylint; for documentation changes, run
+   `mkdocs build --strict`.
 
-### Revisión e integración
+### Review and merge
 
-- Todo pull request debe indicar la feature y enlazar los cambios de
-  documentación/tests correspondientes.
-- En pull requests de ramas `feature/<nombre>`, la aprobación del owner
-  principal de la feature afectada es obligatoria antes de integrar. El reviewer
-  secundario asignado en la tabla realiza la segunda revisión; si el owner es
-  quien propone el cambio, debe aprobarlo otro integrante con responsabilidad
-  sobre la feature, acordado en el propio pull request.
-- No se debe aprobar un cambio que debilite los controles de leakage,
-  validación o seguridad de inferencia sin documentar y probar explícitamente
-  el comportamiento nuevo.
-- Esta tabla define el acuerdo del equipo; la aprobación automática de GitHub
-  solo será obligatoria a nivel de repositorio si se configura una regla de
-  protección de ramas.
+- Every pull request must identify the feature and link to the relevant
+  documentation and tests.
+- For pull requests from `feature/<name>` branches, the primary owner of the
+  affected feature must approve before merge. The secondary reviewer assigned
+  in the table provides the second review. If the owner is the pull request
+  author, another team member with responsibility for the feature must approve;
+  agree on the reviewer in the pull request.
+- Do not approve a change that weakens leakage, validation, or inference safety
+  controls unless the new behavior is explicitly documented and tested.
+- This table defines the team's agreement. GitHub will enforce approval
+  automatically only if a branch protection rule is configured.
