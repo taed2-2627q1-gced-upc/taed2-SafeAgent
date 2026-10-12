@@ -35,7 +35,8 @@ def main():
         # Assert that no registries were lost
         if len(joined_df) != len(predictions_df):
             raise ValueError(
-                f"Error D1: {len(predictions_df) - len(joined_df)} registries were lost during merge from model {model_name}."
+                f"Error D1: {len(predictions_df) - len(joined_df)} registries "
+                f"were lost during merge from model {model_name}."
             )
 
         # Save joined dataset
@@ -45,7 +46,8 @@ def main():
         joined_df.to_json(joined_df_path, orient="records", lines=True)
 
         print(
-            f"\nPredictions from {model_name}, located at {predictions_path}, were merged with source metadata on {joined_df_path}"
+            f"\nPredictions from {model_name}, located at {predictions_path}, "
+            f"were merged with source metadata on {joined_df_path}"
         )
 
 
