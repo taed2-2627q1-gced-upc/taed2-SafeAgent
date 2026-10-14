@@ -5,10 +5,15 @@ import pandas as pd
 
 def main():
 
-    project_root = Path.cwd().parents[1]
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    print(f"Project root: {PROJECT_ROOT}")
+
+    # Read clean dataset for command and command length, located at file "clean.jsonl"
+    clean_data_path = PROJECT_ROOT / Path("data/interim/shell_safety/clean.jsonl")
+    clean_df = pd.read_json(clean_data_path, lines=True)
 
     # Read source metadata, located at file "provenance.jsonl"
-    source_data_path = project_root / Path("data/interim/shell_safety/provenance.jsonl")
+    source_data_path = PROJECT_ROOT / Path("data/interim/shell_safety/provenance.jsonl")
     source_df = pd.read_json(source_data_path, lines=True)
 
     # Normalize the "source" column
@@ -26,11 +31,14 @@ def main():
     # For each model predictions, join with metadata
     for model_name in models_names:
         # Get model predictions and join them with source metadata
-        predictions_path = project_root / Path(
+        predictions_path = PROJECT_ROOT / Path(
             f"models/encoders/{model_name}/validation_predictions.jsonl"
         )
         predictions_df = pd.read_json(predictions_path, lines=True)
         joined_df = pd.merge(predictions_df, source_df, how="inner", on="id", validate="1:1")
+        joined_df = pd.merge(
+            joined_df, clean_df[["id", "command"]], how="inner", on="id", validate="1:1"
+        )
 
         # Assert that no registries were lost
         if len(joined_df) != len(predictions_df):
@@ -39,8 +47,8 @@ def main():
                 f"were lost during merge from model {model_name}."
             )
 
-        # Save joined dataset
-        joined_df_path = project_root / Path(
+        # Save joined dataset into disk
+        joined_df_path = PROJECT_ROOT / Path(
             f"models/encoders/{model_name}/predictions_joined_with_metadata.jsonl"
         )
         joined_df.to_json(joined_df_path, orient="records", lines=True)
