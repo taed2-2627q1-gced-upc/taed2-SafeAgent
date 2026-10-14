@@ -2,10 +2,17 @@ from pathlib import Path
 
 import pandas as pd
 
+from taed2_safeagent.config import MODEL_NAMES
+
 
 def main():
 
-    project_root = Path.cwd().parents[1]
+    project_root = Path(__file__).resolve().parents[2]
+    print(f"Project root: {project_root}")
+
+    # Read clean dataset for command and command length, located at file "clean.jsonl"
+    clean_data_path = project_root / Path("data/interim/shell_safety/clean.jsonl")
+    clean_df = pd.read_json(clean_data_path, lines=True)
 
     # Read source metadata, located at file "provenance.jsonl"
     source_data_path = project_root / Path("data/interim/shell_safety/provenance.jsonl")
@@ -15,22 +22,17 @@ def main():
     source_df_extra = pd.json_normalize(source_df["sources"].str[0])  # type: ignore
     source_df = pd.concat([source_df.drop(columns=["sources"]), source_df_extra], axis=1)
 
-    # Define model names
-    models_names = [
-        "codebert__command__2__a740d875",
-        "codebert__command-context__2__a740d875",
-        "modernbert__command__2__a740d875",
-        "modernbert__command-context__2__a740d875",
-    ]
-
     # For each model predictions, join with metadata
-    for model_name in models_names:
+    for model_name in MODEL_NAMES:
         # Get model predictions and join them with source metadata
         predictions_path = project_root / Path(
             f"models/encoders/{model_name}/validation_predictions.jsonl"
         )
         predictions_df = pd.read_json(predictions_path, lines=True)
         joined_df = pd.merge(predictions_df, source_df, how="inner", on="id", validate="1:1")
+        joined_df = pd.merge(
+            joined_df, clean_df[["id", "command"]], how="inner", on="id", validate="1:1"
+        )
 
         # Assert that no registries were lost
         if len(joined_df) != len(predictions_df):
@@ -39,7 +41,7 @@ def main():
                 f"were lost during merge from model {model_name}."
             )
 
-        # Save joined dataset
+        # Save joined dataset into disk
         joined_df_path = project_root / Path(
             f"models/encoders/{model_name}/predictions_joined_with_metadata.jsonl"
         )
