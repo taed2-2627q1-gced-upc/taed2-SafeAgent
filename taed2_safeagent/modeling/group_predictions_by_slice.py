@@ -4,6 +4,8 @@ from pathlib import Path
 import pandas as pd
 from sklearn.metrics import precision_recall_fscore_support
 
+from taed2_safeagent.config import MODEL_NAMES
+
 
 def compute_subset_metrics(subset):
     """Recieves a subset of the dataset and computes its metrics: Element
@@ -67,14 +69,7 @@ def main():
     project_root = Path(__file__).resolve().parents[2]
     print(f"Project root: {project_root}")
 
-    models_names = [
-        "codebert__command__2__a740d875",
-        "codebert__command-context__2__a740d875",
-        "modernbert__command__2__a740d875",
-        "modernbert__command-context__2__a740d875",
-    ]
-
-    for model_name in models_names:
+    for model_name in MODEL_NAMES:
         predictions_and_metadata_path = project_root / Path(
             f"models/encoders/{model_name}/predictions_joined_with_metadata.jsonl"
         )
