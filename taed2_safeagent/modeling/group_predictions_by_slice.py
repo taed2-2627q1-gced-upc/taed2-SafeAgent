@@ -6,8 +6,8 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 def compute_subset_metrics(subset):
-    """Recieves a subset of the dataset and computes its metrics: Element 
-    count, accuracy, F1-score, precision, recall and critical_cases (cases 
+    """Recieves a subset of the dataset and computes its metrics: Element
+    count, accuracy, F1-score, precision, recall and critical_cases (cases
     where the model predicted "ALLOW" and the real label was "DENY")"""
 
     y_true = subset["true_label"]
