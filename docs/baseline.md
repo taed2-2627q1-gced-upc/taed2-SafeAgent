@@ -14,7 +14,7 @@ uv run --frozen --group data dvc pull
 uv run --frozen --group data dvc repro
 ```
 
-The [local CPU notebook](../notebooks/local_baseline.ipynb) runs the same
+The [local CPU notebook](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/blob/main/notebooks/local_baseline.ipynb) runs the same
 development baseline without Kaggle-specific secrets or paths. Open it from this
 checkout, select its Python 3.11 environment as the kernel, and run all cells.
 It discovers the project root from the notebook working directory and uses the
