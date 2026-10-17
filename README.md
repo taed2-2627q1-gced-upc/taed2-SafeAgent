@@ -55,6 +55,7 @@ Use dvc repro validate when only the data is needed.
 
 The [API guide](docs/api.md) explains how to serve the saved baseline through
 FastAPI, validate one command per request and run the HTTP tests.
+The [deployment guide](docs/deployment.md) adds service operation and HTTP smoke checks.
 
 ## Project layout
 

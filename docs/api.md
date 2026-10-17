@@ -63,6 +63,12 @@ Missing models return 503. Inference failures or invalid output labels return
 500 with a generic error. Model paths and exception details are not returned.
 The service does not log raw commands or context.
 
+## Service preparation
+
+The [deployment guide](deployment.md) provides a Linux service template, startup
+and restart commands, architecture and reusable HTTP checks. It can be prepared
+locally before a VM and final model are available.
+
 ## Tests
 
 ```sh

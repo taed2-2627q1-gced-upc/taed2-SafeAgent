@@ -1,0 +1,14 @@
+[Unit]
+Description=SafeAgent command API
+
+[Service]
+Type=simple
+WorkingDirectory=%h/taed2-SafeAgent
+EnvironmentFile=%h/.config/safeagent/api.env
+ExecStart=/usr/bin/env .venv/bin/python -m uvicorn taed2_safeagent.api.app:app --workers 1
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target
