@@ -9,6 +9,7 @@ nav:
   - Dataset card: dataset-card.md
   - Feature ownership: feature-ownership.md
   - Command API: api.md
+  - API deployment: deployment.md
   - Team workflow: team-workflow.md
   - Model cards:
       - Overview: model-cards/index.md
