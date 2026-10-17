@@ -21,6 +21,14 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
 
+MODEL_NAMES = [
+    "codebert__command__2__a740d875",
+    "codebert__command-context__2__a740d875",
+    "modernbert__command__2__a740d875",
+    "modernbert__command-context__2__a740d875",
+]
+
+
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135
 try:
