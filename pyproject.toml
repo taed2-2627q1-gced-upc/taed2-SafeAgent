@@ -51,6 +51,7 @@ dev = [
     "pylint==4.1.2",
     "pynblint==0.1.6",
     "ruff>=0.16.7",
+    "pytest-cov>=7.1.0",
 ]
 data = [
     "deepchecks==0.19.1",
