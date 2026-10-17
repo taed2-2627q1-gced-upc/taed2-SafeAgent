@@ -3,6 +3,7 @@ from pathlib import Path
 import random
 from typing import Any
 
+from mlflow.entities import Param
 from mlflow.exceptions import MlflowException
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -77,13 +78,11 @@ def predict_encoder_batch(
     model: Any,
     tokenizer: Any,
     rows: list[dict[str, Any]],
-    max_length: int,
+    max_length: int = 512,
     batch_size: int = 32,
-    device: torch.device | None = None,
 ) -> list[str]:
     """Run batched inference on rows using the command-context input format."""
-    if device is None:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
     model.eval()
 
@@ -115,7 +114,6 @@ def evaluate_ablation(
     examples: list[dict[str, Any]],
     seed: int = 42,
     batch_size: int = 32,
-    device: torch.device | None = None,
 ) -> dict[str, Any]:
     """Run context ablation evaluation (shuffled or empty) for a context-trained model."""
     model_dir = Path(model_dir).resolve()
@@ -146,7 +144,7 @@ def evaluate_ablation(
 
     max_length = metadata["settings"].get("max_length", 512)
     predictions = predict_encoder_batch(
-        model, tokenizer, ablated_rows, max_length=max_length, batch_size=batch_size, device=device
+        model, tokenizer, ablated_rows, max_length=max_length, batch_size=batch_size
     )
 
     expected = [row["label"] for row in examples]
@@ -217,8 +215,6 @@ def log_to_mlflow_if_available(result: dict[str, Any], params: dict[str, Any]) -
         mode = result["ablation_mode"]
         run_name = f"{model_name}__ablation-{mode}__seed{result['seed'] or 42}"
 
-        from mlflow.entities import Param
-
         run = client.create_run(
             experiment_id=experiment_id,
             run_name=run_name,
@@ -258,6 +254,7 @@ def log_to_mlflow_if_available(result: dict[str, Any], params: dict[str, Any]) -
         return None
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 @app.command()
 def main(
     model_dir: Path,
@@ -268,7 +265,9 @@ def main(
     params_file: Path = Path("params.yaml"),
     mlflow_log: bool = True,
 ):
-    """Run context ablation experiments (shuffled context and/or empty context) on a context model."""
+    """Run context ablation experiments (shuffled and/or empty context)
+    on a context model.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     config = load_params(params_file)
     examples = load_examples(config, "validation")
