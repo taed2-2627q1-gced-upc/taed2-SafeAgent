@@ -74,7 +74,7 @@ training = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: checks the full pinned dataset"]
+markers = ["integration: checks recovered project data or model artifacts"]
 
 [tool.pylint.main]
 py-version = "3.11"
