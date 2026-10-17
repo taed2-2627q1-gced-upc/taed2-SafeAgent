@@ -79,4 +79,22 @@ Fast tests inject a controlled predictor before startup and require no saved
 weights, DagsHub credentials or network downloads. They cover the three labels,
 schema errors, exact input boundaries, model failures, startup loading and OpenAPI.
 Loader tests use a tiny local fixture to check artifact identity and compatibility.
-Real saved-model integration is a separate check, not established by these tests.
+
+Recover the DVC model before running the separate integration check:
+
+```sh
+uv run --frozen --group data dvc pull models/tfidf_char_linear_svm
+uv run --frozen --group data --group dev pytest tests/test_api_integration.py -q -rs
+```
+
+This check compares HTTP predictions with direct predictions from the saved
+pipeline, with and without context, and verifies the model identity. It does not
+train a model, execute submitted commands, use the reserved test partition or
+measure accuracy. Missing artifacts produce an explicit skip, which does not
+establish integration. The existing CI pipeline creates the baseline before
+running pytest, so this check also runs against that pipeline output.
+
+For a local server smoke check, start Uvicorn using the command above, then open
+`http://127.0.0.1:8000/docs`. Check `/health` and `/ready`, send the example request
+and try an empty command, which should return 422. These checks confirm local
+serving only. A deployed endpoint still needs its own smoke check.
