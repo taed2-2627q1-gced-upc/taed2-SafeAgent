@@ -25,7 +25,8 @@ describes observed implementation, not a delivery date.
 | Baseline modeling and DVC pipeline | `taed2_safeagent/modeling/train.py`, `taed2_safeagent/modeling/evaluate.py`, `dvc.yaml`, `dvc.lock`, `params.yaml` (`baseline`), `tests/test_baseline.py`, `tests/test_model_pipeline.py` | David González | Pau González | Implemented: linear SVM; Logistic Regression is not part of the current baseline |
 | Experiments, encoders, and tracking | `taed2_safeagent/modeling/encoder.py`, `experiment.py`, `tracking.py`, `register.py`, `params.yaml` (`tracking`, `encoders`), `docs/encoder-training.md`, `tests/test_encoder.py`, `tests/test_tracking.py`, `tests/test_registration.py` | Pau Balaguer | Joel Márquez | Implemented: MLflow on DagsHub, encoder training and registration |
 | Quality assurance and sustainability | `tests/`, `notebooks/kaggle_baseline.ipynb`, `.github/workflows/data.yml`, `pyproject.toml`, `Makefile`, `taed2_safeagent/modeling/energy.py`, energy reports in `reports/` | Joel Márquez | David González | Partially implemented: pytest, Ruff, Pylint, CI, and CodeCarbon; PyNBLint is a dependency but is not run in the workflow |
-| Serving and deployment | Future design for `taed2_safeagent/` and deployment documentation | Pau González | Pau Balaguer | Pending: no FastAPI API, Pydantic schemas, ALLOW/ASK/DENY inference endpoints, or Virtech deployment configuration are present in the current code |
+| Command API and HTTP tests | `taed2_safeagent/api/`, `tests/test_api.py`, `docs/api.md` | Joel Márquez | Pau González | Implemented: single command prediction, strict schemas, model loading and HTTP tests |
+| Deployment | Hosting and service operation | Pau González | Pau Balaguer | Pending: provider and deployment setup remain to be confirmed |
 
 A dependency listed in `uv.lock` is not, by itself, evidence that a feature has
 been integrated. Status is based on the code, project configuration, pipeline,
@@ -47,6 +48,8 @@ and operational documentation. In particular, `params.yaml` currently pins
 
 ### Joel Márquez
 
+- **Command API and HTTP tests:** Maintain the FastAPI contract, saved model
+  loading, error behavior and API tests. Keep the service guide reproducible.
 - **Grouping, split, and leakage prevention:** Maintain fingerprinting,
   similarity, and group assignment rules; verify that groups do not cross
   partitions. For the report, explain the protocol, seed, ratios, and split
@@ -71,11 +74,9 @@ and operational documentation. In particular, `params.yaml` currently pins
 - **Data contracts and validation:** Maintain validation of prepared examples
   and their reports. For the report, explain invariants, expected counts,
   duplicate and quarantined rows, and contract limitations.
-- **Serving and deployment:** Lead the future API and deployment design. Before
-  marking this feature as implemented, define schemas, request/response
-  validation, safe behavior for `ALLOW`/`ASK`/`DENY`, inference tests, and a
-  verifiable deployment strategy for Virtech. Do not assume these components
-  already exist.
+- **Deployment:** Coordinate the hosting and service operation design, and
+  review the command API. Confirm the provider and access before deployment.
+  External service checks remain separate from local API tests.
 
 ## Pull request and ownership protocol
 
@@ -86,8 +87,9 @@ rules. To avoid attributing undocumented rules to the project, this section
 formalizes a protocol aligned with the commit history, configuration, and
 current reproduction practices:
 
-1. Use descriptive branch names: `feature/<name>` for functional changes and
-   `docs/<name>` for documentation changes.
+1. Include the real Trello card number in descriptive branch names, such as
+   `feature/trello-20-api-contract` or `docs/trello-35-team-workflow`. See the
+   [team workflow](team-workflow.md) for task links and board status.
 2. Keep each commit focused on one logical change; do not mix unrelated feature
    work with cleanup or unrelated results.
 3. Use Conventional Commit-style messages, for example `feat(model): ...`,
@@ -104,8 +106,9 @@ current reproduction practices:
 
 ### Review and merge
 
-- Every pull request must identify the feature and link to the relevant
-  documentation and tests.
+- Every pull request must identify the feature, include its Trello card number
+  and URL, and link to the relevant documentation and tests. Add the PR URL to
+  the card so the task and implementation are linked in both directions.
 - For pull requests from `feature/<name>` branches, the primary owner of the
   affected feature must approve before merge. The secondary reviewer assigned
   in the table provides the second review. If the owner is the pull request

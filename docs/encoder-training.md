@@ -54,6 +54,25 @@ settings, input DVC lock, truncation counts, validation metrics and aligned
 predictions. Model selection uses macro F1 and the report also shows class
 results, the confusion matrix and DENY examples predicted as ALLOW.
 
+## Diagnose saved validation predictions
+
+After preparing and validating the data, retrieve the four saved
+`validation_predictions.jsonl` files and join them with source metadata:
+
+```sh
+uv run --frozen --group data python -m taed2_safeagent.modeling.join_predictions_with_metadata
+uv run --frozen --group data python -m taed2_safeagent.modeling.diagnostics
+```
+
+The diagnostics command checks that prediction IDs exactly match prepared
+validation IDs, true labels match, and the metadata join preserves each
+prediction. It uses the same command or command-context text that the encoder
+received, and saves Deepchecks performance and confusion-matrix results to
+`reports/encoders/<model>/diagnostics.json`. It includes the existing data
+validation results. Probability-based checks are marked unavailable because
+the saved files contain predicted labels but not class probabilities. This
+command does not load model weights or retrain encoders.
+
 CodeCarbon covers fitting and epoch validation. Its report keeps duration,
 energy in kWh, emissions in kg CO2e and the available hardware details. CPU and
 RAM readings are treated as estimates unless sensor support is verified. The
