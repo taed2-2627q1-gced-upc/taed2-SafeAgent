@@ -1,18 +1,13 @@
 import copy
-import json
-from pathlib import Path
 
 import pytest
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from taed2_safeagent.data.common import LABELS, load_params
-from taed2_safeagent.data.inputs import build_input
-from taed2_safeagent.modeling.common import load_examples
+from tests.behavioral_common import (
+    load_behavioral_model,
+    load_validation_rows_by_id,
+    predict_behavioral_labels,
+)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MODEL_NAME = "modernbert__command-context__2__a740d875"
-MODEL_DIR = PROJECT_ROOT / "models" / "encoders" / MODEL_NAME
 INVARIANCE_CASES = (
     (
         "allow_read_config",
@@ -48,34 +43,10 @@ INVARIANCE_CASES = (
 UNRELATED_CONTEXT_MARKER = "invariance-unrelated-marker.txt"
 
 
-@pytest.fixture(scope="module")
-def invariance_predictions():
-    validation_path = PROJECT_ROOT / "data" / "processed" / "shell_safety" / "validation.jsonl"
-    required_model_files = (
-        "config.json",
-        "model.safetensors",
-        "tokenizer.json",
-        "tokenizer_config.json",
-        "metadata.json",
-    )
-    missing_model_files = [
-        name for name in required_model_files if not (MODEL_DIR / name).is_file()
-    ]
-    if missing_model_files or not validation_path.is_file():
-        pytest.skip(
-            "Behavioral inference requires prepared validation data and the local "
-            f"{MODEL_NAME} DVC artifact"
-        )
-
-    metadata = json.loads((MODEL_DIR / "metadata.json").read_text(encoding="utf-8"))
-    if metadata["model"] != "modernbert" or metadata["input_mode"] != "command-context":
-        raise ValueError(f"Unexpected model artifact: {MODEL_DIR}")
-    if metadata["labels"] != list(LABELS):
-        raise ValueError("Model label order differs from the project label order")
-
-    params = load_params(PROJECT_ROOT / "params.yaml")
-    validation_rows = load_examples(params, "validation")
-    rows_by_id = {row["id"]: row for row in validation_rows}
+@pytest.fixture(name="invariance_predictions", scope="module")
+def fixture_invariance_predictions():
+    tokenizer, model, metadata = load_behavioral_model()
+    rows_by_id = load_validation_rows_by_id()
     missing_ids = {identifier for _, identifier, _ in INVARIANCE_CASES} - rows_by_id.keys()
     if missing_ids:
         raise AssertionError(
@@ -93,31 +64,9 @@ def invariance_predictions():
         untracked.sort()
         altered_rows.append(altered)
 
-    rows = original_rows + altered_rows
-    texts = [build_input(row, "command-context") for row in rows]
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True)
-    model = AutoModelForSequenceClassification.from_pretrained(
-        MODEL_DIR,
-        local_files_only=True,
-        trust_remote_code=False,
+    predicted_labels = predict_behavioral_labels(
+        original_rows + altered_rows, tokenizer, model, metadata
     )
-    model.to("cpu")
-    model.eval()
-    torch.set_num_threads(1)
-    encoded = tokenizer(
-        texts,
-        truncation=True,
-        max_length=metadata["settings"]["max_length"],
-        padding=True,
-        return_tensors="pt",
-    )
-    with torch.inference_mode():
-        logits = model(**encoded).logits
-    predictions = logits.argmax(dim=-1).tolist()
-    labels_by_index = [model.config.id2label[index] for index in range(len(LABELS))]
-    if labels_by_index != list(LABELS):
-        raise ValueError("Model configuration label mapping differs from metadata")
-    predicted_labels = [labels_by_index[index] for index in predictions]
     return {
         case_name: (predicted_labels[index], predicted_labels[index + len(INVARIANCE_CASES)])
         for index, (case_name, _, _) in enumerate(INVARIANCE_CASES)
