@@ -8,6 +8,7 @@ nav:
   - Encoder training: encoder-training.md
   - Dataset card: dataset-card.md
   - Feature ownership: feature-ownership.md
+  - Command API: api.md
   - Model cards:
       - Overview: model-cards/index.md
       - TF-IDF + Linear SVM: model-cards/model_card_tfidf_linear_svm.md

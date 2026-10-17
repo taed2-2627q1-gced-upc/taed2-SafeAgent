@@ -20,6 +20,8 @@ to train or recover the models.
 
 ## Project setup
 
+The [API guide](api.md) describes command prediction, readiness and HTTP tests.
+
 See the [getting started guide](getting-started.md) and the
 [repository README](https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent#readme).
 See [feature ownership](feature-ownership.md) for team responsibilities and the

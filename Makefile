@@ -39,9 +39,9 @@ test:
 
 ## Check changed Python code
 lint:
-	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
+	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests
+	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests
+	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests
 
 ## Build public docs
 docs:

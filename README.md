@@ -51,11 +51,17 @@ records the run in DagsHub. The run link is saved in reports/baseline/mlflow_run
 Normal DVC reproduction reuses current outputs and does not create an MLflow run.
 Use dvc repro validate when only the data is needed.
 
+## Command API
+
+The [API guide](docs/api.md) explains how to serve the saved baseline through
+FastAPI, validate one command per request and run the HTTP tests.
+
 ## Project layout
 
 | Folder or file | Contents |
 | --- | --- |
 | taed2_safeagent/data | Source checks, audit, groups, splits, validation and input builder |
+| taed2_safeagent/api | Command schemas, saved model loading and HTTP routes |
 | taed2_safeagent/dataset.py | Data command line interface |
 | taed2_safeagent/features.py | Character features for the baseline |
 | taed2_safeagent/modeling | Training, model loading and validation evaluation |
