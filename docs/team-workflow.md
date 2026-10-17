@@ -8,6 +8,9 @@ defines maintenance and review responsibilities.
 
 The project uses the [TAED2 SafeAgent board](https://trello.com/b/24wUyWhX/taed2-safeagent).
 Its columns are BACKLOG, TO DO, IN PROGRESS, REVIEW and DONE.
+Cards use the relevant M1, M2, M3 or M4 milestone label. Tasks that span the
+project, such as coordination, general cleanup and documentation maintenance,
+use General. Additional topic labels can complement the milestone label.
 The [board snapshot from 2026-10-17](assets/trello-board-2026-10-17.json) exports
 the open cards, their columns, assigned members and linked pull requests.
 It is a dated planning snapshot. Card position alone does not prove that code
