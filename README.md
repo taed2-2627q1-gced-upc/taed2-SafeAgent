@@ -79,6 +79,13 @@ FastAPI, validate one command per request and run the HTTP tests.
 
 The project started from Cookiecutter Data Science.
 
+## Team workflow
+
+The [team workflow guide](docs/team-workflow.md) links the Trello board to
+branches and pull requests, includes a dated board export, and explains Slack
+coordination and the GitHub notification setup. See
+[feature ownership](docs/feature-ownership.md) for maintenance and review roles.
+
 ## Quality checks
 
 ```sh
