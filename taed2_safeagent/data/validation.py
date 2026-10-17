@@ -73,7 +73,17 @@ def great_expectations_checks(assigned):
     source = context.data_sources.add_pandas(name="safeagent")
     results = {}
     for split, rows in assigned.items():
-        frame = pd.DataFrame([{**row, "context": json.dumps(row["context"])} for row in rows])
+        frame = pd.DataFrame(
+            [
+                {
+                    **row,
+                    "context": json.dumps(row["context"])
+                    if isinstance(row.get("context"), dict)
+                    else row.get("context"),
+                }
+                for row in rows
+            ]
+        )
         asset = source.add_dataframe_asset(name=split)
         batch = asset.add_batch_definition_whole_dataframe(name="all_rows").get_batch(
             batch_parameters={"dataframe": frame}
@@ -89,6 +99,10 @@ def great_expectations_checks(assigned):
         ]
         expectations.extend(
             gx.expectations.ExpectColumnValuesToNotBeNull(column=column)
+            for column in sorted(PREPARED_FIELDS)
+        )
+        expectations.extend(
+            gx.expectations.ExpectColumnValuesToBeOfType(column=column, type_="str")
             for column in sorted(PREPARED_FIELDS)
         )
         passed = [bool(batch.validate(expectation).success) for expectation in expectations]

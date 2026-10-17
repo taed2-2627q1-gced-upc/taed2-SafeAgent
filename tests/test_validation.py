@@ -66,6 +66,13 @@ def test_great_expectations_failure_is_an_error(bundle):
         great_expectations_checks(assigned)
 
 
+def test_great_expectations_duplicate_ids_within_split_fail(bundle):
+    assigned = assigned_rows(bundle)
+    assigned["train"][1]["id"] = assigned["train"][0]["id"]
+    with pytest.raises(ValueError, match="Great Expectations failed: train"):
+        great_expectations_checks(assigned)
+
+
 def test_deepchecks_overlap_is_an_error(bundle):
     assigned = assigned_rows(bundle)
     assigned["validation"].append(deepcopy(assigned["train"][0]))
@@ -111,3 +118,11 @@ def test_full_dataset_contract_and_paired_inputs():
     for rows in assigned_rows(params).values():
         assert all(build_input(row, "command") == row["command"] for row in rows)
         assert all("CONTEXT\n" in build_input(row, "command-context") for row in rows)
+
+
+@pytest.mark.parametrize("field", ["id", "group_id", "command", "context", "label"])
+def test_great_expectations_invalid_column_type_fails(bundle, field):
+    assigned = assigned_rows(bundle)
+    assigned["train"][0][field] = 12345
+    with pytest.raises(ValueError, match="Great Expectations failed: train"):
+        great_expectations_checks(assigned)
