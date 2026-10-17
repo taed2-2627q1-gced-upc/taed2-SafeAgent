@@ -1,0 +1,437 @@
+{
+  "format": "safeagent-trello-snapshot-v1",
+  "captured_at_utc": "2026-10-17T09:11:33Z",
+  "scope": "Open cards grouped by their current board list",
+  "board": {
+    "name": "TAED2 — SafeAgent",
+    "url": "https://trello.com/b/24wUyWhX/taed2-safeagent"
+  },
+  "lists": [
+    {
+      "name": "BACKLOG",
+      "cards": [
+        {
+          "number": 18,
+          "name": "Prunning files/datasets not used",
+          "url": "https://trello.com/c/LVZKyqQj",
+          "members": [],
+          "labels": [],
+          "pull_requests": []
+        },
+        {
+          "number": 19,
+          "name": "Keep documentation up to date",
+          "url": "https://trello.com/c/6dBEoQuf",
+          "members": [],
+          "labels": [],
+          "pull_requests": []
+        }
+      ]
+    },
+    {
+      "name": "TO DO",
+      "cards": [
+        {
+          "number": 14,
+          "name": "Contamination metadata at README, GaissaLabel",
+          "url": "https://trello.com/c/cJp2JhwE",
+          "members": [],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 10,
+          "name": "Continuous Integration, Static Analysis, Regression Tests",
+          "url": "https://trello.com/c/nDd3nure",
+          "members": [],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 20,
+          "name": "Define the API request and response",
+          "url": "https://trello.com/c/eDdaCltE",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 21,
+          "name": "Load one saved model at startup",
+          "url": "https://trello.com/c/cvXXKnhp",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 22,
+          "name": "Add health and readiness endpoints",
+          "url": "https://trello.com/c/5x6dHsef",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 23,
+          "name": "Add the prediction endpoint",
+          "url": "https://trello.com/c/CYiMhfxr",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 24,
+          "name": "Extend request and failure tests",
+          "url": "https://trello.com/c/wN9F7Wyl",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 25,
+          "name": "Check the API with a real saved model",
+          "url": "https://trello.com/c/EEhIajBr",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 26,
+          "name": "Evaluate shuffled context + Empty context experiments",
+          "url": "https://trello.com/c/e0JspO9t",
+          "members": [
+            "Pau Balaguer Coll"
+          ],
+          "labels": [
+            "M3 - Quality Assurance",
+            "Model Training and Evaluation"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 27,
+          "name": "Add Deepchecks model diagnostics",
+          "url": "https://trello.com/c/GIHD6dn7",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 28,
+          "name": "Run the notebook and check its quality",
+          "url": "https://trello.com/c/00V4We5n",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 29,
+          "name": "Record baseline training energy",
+          "url": "https://trello.com/c/8gxNp7rn",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 30,
+          "name": "Record inference energy",
+          "url": "https://trello.com/c/sHTkg1Iy",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 31,
+          "name": "Add emissions metadata to the README",
+          "url": "https://trello.com/c/uKEQnT5p",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 32,
+          "name": "Add the GAISSALabel assessment",
+          "url": "https://trello.com/c/ThuQAOgd",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M3 - Quality Assurance"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 33,
+          "name": "Prepare access and runtime on Virtech",
+          "url": "https://trello.com/c/dKRD4vTR",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 34,
+          "name": "Deploy and smoke test the API",
+          "url": "https://trello.com/c/ktNuBawJ",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M4 - Model Deployment (API)"
+          ],
+          "pull_requests": []
+        }
+      ]
+    },
+    {
+      "name": "IN PROGRESS",
+      "cards": [
+        {
+          "number": 35,
+          "name": "Link Trello tasks with GitHub and Slack",
+          "url": "https://trello.com/c/FSwRrpFu",
+          "members": [],
+          "labels": [],
+          "pull_requests": []
+        }
+      ]
+    },
+    {
+      "name": "REVIEW",
+      "cards": []
+    },
+    {
+      "name": "DONE",
+      "cards": [
+        {
+          "number": 15,
+          "name": "Set up DVC data pipeline",
+          "url": "https://trello.com/c/TZE6FlcG",
+          "members": [
+            "Joel Márquez Álvarez",
+            "Pau Balaguer Coll"
+          ],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": [
+            "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/pull/5"
+          ]
+        },
+        {
+          "number": 12,
+          "name": "Data, model, metric logs and versioning",
+          "url": "https://trello.com/c/nCFWh5pO",
+          "members": [],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": [
+            "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/pull/12"
+          ]
+        },
+        {
+          "number": 13,
+          "name": "Model performance requirements",
+          "url": "https://trello.com/c/PuFasa94",
+          "members": [],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 9,
+          "name": "Automate pipeline, hyper-parameter optimization and model selection",
+          "url": "https://trello.com/c/zutDEq1o",
+          "members": [],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 11,
+          "name": "Assign Owner to each feature",
+          "url": "https://trello.com/c/fI30D7zr",
+          "members": [
+            "Pau González Alcaide"
+          ],
+          "labels": [],
+          "pull_requests": []
+        },
+        {
+          "number": 17,
+          "name": "Build first reproducible baseline",
+          "url": "https://trello.com/c/GC7YacZR",
+          "members": [
+            "Joel Márquez Álvarez",
+            "Pau González Alcaide"
+          ],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": [
+            "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/pull/3"
+          ]
+        },
+        {
+          "number": 16,
+          "name": "Integrate MLflow experiment tracking",
+          "url": "https://trello.com/c/SlxCVZdv",
+          "members": [
+            "Pau Balaguer Coll",
+            "david.gonzalez.acen"
+          ],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": [
+            "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent/pull/4"
+          ]
+        },
+        {
+          "number": 7,
+          "name": "Document what has been completed so far",
+          "url": "https://trello.com/c/ITatacMx",
+          "members": [
+            "Pau González Alcaide",
+            "david.gonzalez.acen"
+          ],
+          "labels": [
+            "M2 - Reproducibility"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 6,
+          "name": "Create GitHub/DagsHub repository",
+          "url": "https://trello.com/c/GcbGW7Jg",
+          "members": [
+            "Pau Balaguer Coll"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 3,
+          "name": "Invite everyone to Trello",
+          "url": "https://trello.com/c/mf6bQTYl",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 2,
+          "name": "Create Model Card",
+          "url": "https://trello.com/c/5ow61jTu",
+          "members": [
+            "Pau González Alcaide",
+            "david.gonzalez.acen"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 4,
+          "name": "Create and share Slack server",
+          "url": "https://trello.com/c/P42t6Y7u",
+          "members": [
+            "Joel Márquez Álvarez"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 5,
+          "name": "Select Cloud Provider",
+          "url": "https://trello.com/c/qAupC1Xe",
+          "members": [
+            "Joel Márquez Álvarez",
+            "Pau González Alcaide",
+            "Pau Balaguer Coll",
+            "david.gonzalez.acen"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        },
+        {
+          "number": 1,
+          "name": "Create Dataset Card",
+          "url": "https://trello.com/c/0kRbA9Az",
+          "members": [
+            "Joel Márquez Álvarez",
+            "Pau Balaguer Coll"
+          ],
+          "labels": [
+            "M1 - Inception"
+          ],
+          "pull_requests": []
+        }
+      ]
+    }
+  ]
+}

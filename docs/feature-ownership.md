@@ -86,8 +86,9 @@ rules. To avoid attributing undocumented rules to the project, this section
 formalizes a protocol aligned with the commit history, configuration, and
 current reproduction practices:
 
-1. Use descriptive branch names: `feature/<name>` for functional changes and
-   `docs/<name>` for documentation changes.
+1. Include the real Trello card number in descriptive branch names, such as
+   `feature/trello-20-api-contract` or `docs/trello-35-team-workflow`. See the
+   [team workflow](team-workflow.md) for task links and board status.
 2. Keep each commit focused on one logical change; do not mix unrelated feature
    work with cleanup or unrelated results.
 3. Use Conventional Commit-style messages, for example `feat(model): ...`,
@@ -104,8 +105,9 @@ current reproduction practices:
 
 ### Review and merge
 
-- Every pull request must identify the feature and link to the relevant
-  documentation and tests.
+- Every pull request must identify the feature, include its Trello card number
+  and URL, and link to the relevant documentation and tests. Add the PR URL to
+  the card so the task and implementation are linked in both directions.
 - For pull requests from `feature/<name>` branches, the primary owner of the
   affected feature must approve before merge. The secondary reviewer assigned
   in the table provides the second review. If the owner is the pull request
