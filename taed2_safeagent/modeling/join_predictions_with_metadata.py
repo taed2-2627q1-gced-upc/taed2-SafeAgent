@@ -2,13 +2,12 @@ from pathlib import Path
 
 import pandas as pd
 
+from taed2_safeagent.config import PROJ_ROOT
+
 
 def main():
-
-    project_root = Path.cwd().parents[1]
-
     # Read source metadata, located at file "provenance.jsonl"
-    source_data_path = project_root / Path("data/interim/shell_safety/provenance.jsonl")
+    source_data_path = PROJ_ROOT / "data/interim/shell_safety/provenance.jsonl"
     source_df = pd.read_json(source_data_path, lines=True)
 
     # Normalize the "source" column
@@ -26,7 +25,7 @@ def main():
     # For each model predictions, join with metadata
     for model_name in models_names:
         # Get model predictions and join them with source metadata
-        predictions_path = project_root / Path(
+        predictions_path = PROJ_ROOT / Path(
             f"models/encoders/{model_name}/validation_predictions.jsonl"
         )
         predictions_df = pd.read_json(predictions_path, lines=True)
@@ -40,7 +39,7 @@ def main():
             )
 
         # Save joined dataset
-        joined_df_path = project_root / Path(
+        joined_df_path = PROJ_ROOT / Path(
             f"models/encoders/{model_name}/predictions_joined_with_metadata.jsonl"
         )
         joined_df.to_json(joined_df_path, orient="records", lines=True)
