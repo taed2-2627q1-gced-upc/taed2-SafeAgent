@@ -26,7 +26,7 @@ describes observed implementation, not a delivery date.
 | Experiments, encoders, and tracking | `taed2_safeagent/modeling/encoder.py`, `experiment.py`, `tracking.py`, `register.py`, `params.yaml` (`tracking`, `encoders`), `docs/encoder-training.md`, `tests/test_encoder.py`, `tests/test_tracking.py`, `tests/test_registration.py` | Pau Balaguer | Joel Márquez | Implemented: MLflow on DagsHub, encoder training and registration |
 | Quality assurance and sustainability | `tests/`, `notebooks/kaggle_baseline.ipynb`, `.github/workflows/data.yml`, `pyproject.toml`, `Makefile`, `taed2_safeagent/modeling/energy.py`, energy reports in `reports/` | Joel Márquez | David González | Partially implemented: pytest, Ruff, Pylint, CI, and CodeCarbon; PyNBLint is a dependency but is not run in the workflow |
 | Command API and HTTP tests | `taed2_safeagent/api/`, `tests/test_api.py`, `docs/api.md` | Joel Márquez | Pau González | Implemented: single command prediction, strict schemas, model loading and HTTP tests |
-| Deployment | Hosting and service operation | Pau González | Pau Balaguer | Pending: provider and deployment setup remain to be confirmed |
+| Deployment | Hosting and service operation | Pau González | Pau Balaguer | Implemented: Virtech VM runtime, frozen environment setup, and DVC model recovery |
 
 A dependency listed in `uv.lock` is not, by itself, evidence that a feature has
 been integrated. Status is based on the code, project configuration, pipeline,
@@ -75,8 +75,9 @@ and operational documentation. In particular, `params.yaml` currently pins
   and their reports. For the report, explain invariants, expected counts,
   duplicate and quarantined rows, and contract limitations.
 - **Deployment:** Coordinate the hosting and service operation design, and
-  review the command API. Confirm the provider and access before deployment.
-  External service checks remain separate from local API tests.
+  review the command API. Maintain the Virtech VM runtime provisioning and
+  DVC model recovery with credentials kept outside Git. External service checks
+  remain separate from local API tests.
 
 ## Pull request and ownership protocol
 
