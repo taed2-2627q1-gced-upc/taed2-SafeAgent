@@ -51,9 +51,22 @@ def test_roundtrip_and_evaluation_keep_ids_aligned(baseline_params):
     assert metrics["split"] == "validation"
     assert metrics["rows"] == len(examples)
     assert metrics["confusion_matrix"]["labels"] == list(LABELS)
+    energy_path = baseline_params["baseline"]["report_dir"] / "energy.json"
+    assert energy_path.is_file()
+    energy_report = json.loads(energy_path.read_text(encoding="utf-8"))
+    assert "scope" in energy_report
+    assert "status" in energy_report
+
+
+def test_train_without_energy_settings(baseline_params):
+    params_without_energy = deepcopy(baseline_params)
+    params_without_energy.pop("energy", None)
+    metadata = train(params_without_energy)
+    assert metadata["train_rows"] > 0
 
 
 def test_targets_and_metadata_do_not_enter_vocabulary(baseline_params):
+
     model_dir = baseline_params["baseline"]["model_dir"]
     train(baseline_params)
     pipeline, _ = load_model(model_dir)
