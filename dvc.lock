@@ -46,16 +46,16 @@ stages:
       size: 3560
     - path: taed2_safeagent/data/validation.py
       hash: md5
-      md5: ed144edc70a0c9fc455605157e3f546d
-      size: 8546
+      md5: 1825ff85f1a9a83feb6fc89e71ca6389
+      size: 8951
     - path: taed2_safeagent/dataset.py
       hash: md5
       md5: 443bd6a15eb88e48a4ab3a1afc73bd24
       size: 1256
     - path: uv.lock
       hash: md5
-      md5: eb492dac4996a1cb255c2c546f1c2ff0
-      size: 414711
+      md5: 0d1c983f1027daac9c1dda0eb3a33c2b
+      size: 447564
     params:
       params.yaml:
         context:
@@ -72,21 +72,21 @@ stages:
             train.jsonl:
               rows: 30002
               bytes: 23984713
-              sha256:
+              sha256: 
                 698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
             validation.jsonl:
               rows: 3002
               bytes: 2408952
-              sha256:
+              sha256: 
                 ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
             test.jsonl:
               rows: 1003
               bytes: 804564
-              sha256:
+              sha256: 
                 23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
             README.md:
               bytes: 580
-              sha256:
+              sha256: 
                 92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
         validation:
           expected_clean_rows: 33325
@@ -149,16 +149,16 @@ stages:
       size: 3560
     - path: taed2_safeagent/data/validation.py
       hash: md5
-      md5: ed144edc70a0c9fc455605157e3f546d
-      size: 8546
+      md5: 1825ff85f1a9a83feb6fc89e71ca6389
+      size: 8951
     - path: taed2_safeagent/dataset.py
       hash: md5
       md5: 443bd6a15eb88e48a4ab3a1afc73bd24
       size: 1256
     - path: uv.lock
       hash: md5
-      md5: eb492dac4996a1cb255c2c546f1c2ff0
-      size: 414711
+      md5: 0d1c983f1027daac9c1dda0eb3a33c2b
+      size: 447564
     params:
       params.yaml:
         context:
@@ -258,16 +258,16 @@ stages:
       size: 3560
     - path: taed2_safeagent/data/validation.py
       hash: md5
-      md5: ed144edc70a0c9fc455605157e3f546d
-      size: 8546
+      md5: 1825ff85f1a9a83feb6fc89e71ca6389
+      size: 8951
     - path: taed2_safeagent/dataset.py
       hash: md5
       md5: 443bd6a15eb88e48a4ab3a1afc73bd24
       size: 1256
     - path: uv.lock
       hash: md5
-      md5: eb492dac4996a1cb255c2c546f1c2ff0
-      size: 414711
+      md5: 0d1c983f1027daac9c1dda0eb3a33c2b
+      size: 447564
     params:
       params.yaml:
         context:
@@ -301,21 +301,21 @@ stages:
             train.jsonl:
               rows: 30002
               bytes: 23984713
-              sha256:
+              sha256: 
                 698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
             validation.jsonl:
               rows: 3002
               bytes: 2408952
-              sha256:
+              sha256: 
                 ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
             test.jsonl:
               rows: 1003
               bytes: 804564
-              sha256:
+              sha256: 
                 23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
             README.md:
               bytes: 580
-              sha256:
+              sha256: 
                 92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
         split:
           seed: 42
@@ -332,10 +332,10 @@ stages:
     outs:
     - path: reports/data/validation.json
       hash: md5
-      md5: 1d82906c4f0f789003e6930308c61486
+      md5: 8419e3861af749f3bd5efc590676c884
       size: 1332
   train:
-    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train 
       --params params.yaml
     deps:
     - path: data/processed/shell_safety/manifest.json
@@ -348,11 +348,11 @@ stages:
       size: 17796175
     - path: pyproject.toml
       hash: md5
-      md5: 4fc163903912beef525045db1bf13b3f
-      size: 1639
+      md5: d8afbbcc033709b665d38495e4b7f471
+      size: 1770
     - path: reports/data/validation.json
       hash: md5
-      md5: 1d82906c4f0f789003e6930308c61486
+      md5: 8419e3861af749f3bd5efc590676c884
       size: 1332
     - path: taed2_safeagent/__init__.py
       hash: md5
@@ -386,14 +386,18 @@ stages:
       hash: md5
       md5: 4a0b6c6a44093f469a3b9604c7815459
       size: 3868
+    - path: taed2_safeagent/modeling/energy.py
+      hash: md5
+      md5: 3ae1a0f12970e3c3788a99ccce79a8c4
+      size: 1697
     - path: taed2_safeagent/modeling/train.py
       hash: md5
-      md5: 578c460c8ee4594a6fca05b8ebfa171a
-      size: 2693
+      md5: 86ce439638446bd69d041f6ff5f5a5e2
+      size: 2985
     - path: uv.lock
       hash: md5
-      md5: eb492dac4996a1cb255c2c546f1c2ff0
-      size: 414711
+      md5: 0d1c983f1027daac9c1dda0eb3a33c2b
+      size: 447564
     params:
       params.yaml:
         baseline.input_mode: command
@@ -416,6 +420,11 @@ stages:
           norm: l2
         context:
           version: safe_context_v1
+        energy:
+          country_iso_code: USA
+          country_assumed: true
+          measure_power_secs: 5
+          gpu_ids: '0'
         grouping:
           version: command_context_v1
           comment_markers:
@@ -441,21 +450,21 @@ stages:
             train.jsonl:
               rows: 30002
               bytes: 23984713
-              sha256:
+              sha256: 
                 698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
             validation.jsonl:
               rows: 3002
               bytes: 2408952
-              sha256:
+              sha256: 
                 ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
             test.jsonl:
               rows: 1003
               bytes: 804564
-              sha256:
+              sha256: 
                 23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
             README.md:
               bytes: 580
-              sha256:
+              sha256: 
                 92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
         split:
           seed: 42
@@ -467,11 +476,15 @@ stages:
     outs:
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: 614e98433c114fedc5389ae492116a57.dir
-      size: 2126233
+      md5: 078db51ff8a87c2a1a6ffa1a0ac4f3ea.dir
+      size: 2149233
       nfiles: 2
+    - path: reports/baseline/energy.json
+      hash: md5
+      md5: 3b76ce292e76c370f20b2da1aa27e4d4
+      size: 1361
   evaluate:
-    cmd: uv run --frozen --group data python -m
+    cmd: uv run --frozen --group data python -m 
       taed2_safeagent.modeling.evaluate --params params.yaml
     deps:
     - path: data/processed/shell_safety/manifest.json
@@ -571,21 +584,21 @@ stages:
             train.jsonl:
               rows: 30002
               bytes: 23984713
-              sha256:
+              sha256: 
                 698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
             validation.jsonl:
               rows: 3002
               bytes: 2408952
-              sha256:
+              sha256: 
                 ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
             test.jsonl:
               rows: 1003
               bytes: 804564
-              sha256:
+              sha256: 
                 23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
             README.md:
               bytes: 580
-              sha256:
+              sha256: 
                 92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
         split:
           seed: 42
