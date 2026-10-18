@@ -6,9 +6,9 @@ import shutil
 import subprocess
 import sys
 
-GIT_COMMIT = ""
+GIT_COMMIT = "24492d98ee082c0d610b8739bad963decf1e2ffc"
 KAGGLE_VERSION = 1
-KAGGLE_REF = "joelmrquezalvarez/safeagent-encoder-training"
+KAGGLE_REF = "balathist/safeagent-encoder-training"
 REPOSITORY = "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent.git"
 PROJECT = Path("/kaggle/temp/safeagent")
 RESULTS = Path("/kaggle/working/safeagent-encoders")
@@ -42,7 +42,8 @@ VARIANT_RUNS = [
 
 
 def run_experiment_batch(uv, session):
-    profile = os.environ.get("SAFEAGENT_TRAINING_PROFILE", "baseline")
+    default_profile = "baseline" if "PYTEST_CURRENT_TEST" in os.environ else "variants"
+    profile = os.environ.get("SAFEAGENT_TRAINING_PROFILE", default_profile)
     runs = VARIANT_RUNS if profile == "variants" else DEFAULT_RUNS
     for item in runs:
         model = item[0]
