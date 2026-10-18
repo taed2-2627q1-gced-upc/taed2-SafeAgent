@@ -80,6 +80,45 @@ encoders:
     warmup_ratio: 0.1
     weight_decay: 0.01
     gradient_checkpointing: true
+    lr_scheduler_type: linear
+    class_weights: null
+  variants:
+    weighted:
+      seed: 42
+      epochs: 2
+      learning_rate: 0.00002
+      batch_size: 8
+      gradient_accumulation_steps: 4
+      max_length: 512
+      warmup_ratio: 0.1
+      weight_decay: 0.01
+      gradient_checkpointing: true
+      lr_scheduler_type: linear
+      class_weights: [0.8168, 0.9191, 1.4542]
+    extended_epochs:
+      seed: 42
+      epochs: 3
+      learning_rate: 0.00002
+      batch_size: 8
+      gradient_accumulation_steps: 4
+      max_length: 512
+      warmup_ratio: 0.1
+      weight_decay: 0.01
+      gradient_checkpointing: true
+      lr_scheduler_type: cosine
+      class_weights: null
+    champion:
+      seed: 42
+      epochs: 3
+      learning_rate: 0.00002
+      batch_size: 8
+      gradient_accumulation_steps: 4
+      max_length: 512
+      warmup_ratio: 0.1
+      weight_decay: 0.01
+      gradient_checkpointing: true
+      lr_scheduler_type: cosine
+      class_weights: [0.8168, 0.9191, 1.4542]
 energy:
   country_iso_code: USA
   country_assumed: true

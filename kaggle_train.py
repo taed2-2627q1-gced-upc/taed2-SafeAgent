@@ -24,6 +24,62 @@ def normalize_lock(root):
     lock.write_text(text + "\n", encoding="utf-8", newline="\n")
 
 
+DEFAULT_RUNS = [
+    ("codebert", "command"),
+    ("codebert", "command-context"),
+    ("modernbert", "command"),
+    ("modernbert", "command-context"),
+]
+
+VARIANT_RUNS = [
+    ("codebert", "command-context", "weighted"),
+    ("modernbert", "command-context", "weighted"),
+    ("codebert", "command-context", "extended_epochs"),
+    ("modernbert", "command-context", "extended_epochs"),
+    ("codebert", "command-context", "champion"),
+    ("modernbert", "command-context", "champion"),
+]
+
+
+def run_experiment_batch(uv, session):
+    profile = os.environ.get("SAFEAGENT_TRAINING_PROFILE", "baseline")
+    runs = VARIANT_RUNS if profile == "variants" else DEFAULT_RUNS
+    for item in runs:
+        model = item[0]
+        mode = item[1]
+        variant = item[2] if len(item) > 2 else None
+        name = f"{model}__{mode}" if not variant else f"{model}__{mode}__{variant}"
+        print(f"Starting {name}", flush=True)
+        result = {"model": model, "input_mode": mode, "output": name}
+        if variant:
+            result["variant"] = variant
+        try:
+            cmd = [
+                *uv,
+                "python",
+                "-m",
+                "taed2_safeagent.modeling.encoder",
+                model,
+                str(RESULTS / name),
+                "--mode",
+                mode,
+            ]
+            if variant:
+                cmd.extend(["--variant", variant])
+            run(*cmd)
+            result["status"] = "FINISHED"
+        except subprocess.CalledProcessError:
+            result["status"] = "FAILED"
+        session["runs"].append(result)
+        (RESULTS / "session.json").write_text(
+            json.dumps(session, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    print("Encoder runs completed", flush=True)
+    if any(result["status"] == "FAILED" for result in session["runs"]):
+        raise RuntimeError("Some encoder runs failed, check session.json")
+
+
 def main():
     if not re.fullmatch(r"[0-9a-f]{40}", GIT_COMMIT):
         raise ValueError("Set the published source commit before submitting")
@@ -67,33 +123,7 @@ def main():
         "shared_logging": "pending local result registration",
         "runs": [],
     }
-    for model in ("codebert", "modernbert"):
-        for mode in ("command", "command-context"):
-            name = f"{model}__{mode}"
-            print(f"Starting {name}", flush=True)
-            result = {"model": model, "input_mode": mode, "output": name}
-            try:
-                run(
-                    *uv,
-                    "python",
-                    "-m",
-                    "taed2_safeagent.modeling.encoder",
-                    model,
-                    str(RESULTS / name),
-                    "--mode",
-                    mode,
-                )
-                result["status"] = "FINISHED"
-            except subprocess.CalledProcessError:
-                result["status"] = "FAILED"
-            session["runs"].append(result)
-            (RESULTS / "session.json").write_text(
-                json.dumps(session, indent=2) + "\n",
-                encoding="utf-8",
-            )
-    print("Encoder runs completed", flush=True)
-    if any(result["status"] == "FAILED" for result in session["runs"]):
-        raise RuntimeError("Some encoder runs failed, check session.json")
+    run_experiment_batch(uv, session)
 
 
 if __name__ == "__main__":
