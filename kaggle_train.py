@@ -6,8 +6,8 @@ import shutil
 import subprocess
 import sys
 
-GIT_COMMIT = "24492d98ee082c0d610b8739bad963decf1e2ffc"
-KAGGLE_VERSION = 1
+GIT_COMMIT = "727af566daf4c465155f2c7bc83025fa49155198"
+KAGGLE_VERSION = 2
 KAGGLE_REF = "balathist/safeagent-encoder-training"
 REPOSITORY = "https://github.com/taed2-2627q1-gced-upc/taed2-SafeAgent.git"
 PROJECT = Path("/kaggle/temp/safeagent")
@@ -40,11 +40,21 @@ VARIANT_RUNS = [
     ("modernbert", "command-context", "champion"),
 ]
 
+MULTI_SEED_RUNS = [
+    ("modernbert", "command-context", "champion_seed43"),
+    ("modernbert", "command-context", "champion_seed44"),
+]
+
 
 def run_experiment_batch(uv, session):
-    default_profile = "baseline" if "PYTEST_CURRENT_TEST" in os.environ else "variants"
+    default_profile = "baseline" if "PYTEST_CURRENT_TEST" in os.environ else "multi_seed"
     profile = os.environ.get("SAFEAGENT_TRAINING_PROFILE", default_profile)
-    runs = VARIANT_RUNS if profile == "variants" else DEFAULT_RUNS
+    if profile == "multi_seed":
+        runs = MULTI_SEED_RUNS
+    elif profile == "variants":
+        runs = VARIANT_RUNS
+    else:
+        runs = DEFAULT_RUNS
     for item in runs:
         model = item[0]
         mode = item[1]
