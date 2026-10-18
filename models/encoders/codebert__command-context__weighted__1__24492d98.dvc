@@ -1,0 +1,6 @@
+outs:
+- md5: 1bf4187396e5a823e08f2de16829aa42.dir
+  size: 503831051
+  nfiles: 9
+  hash: md5
+  path: codebert__command-context__weighted__1__24492d98
