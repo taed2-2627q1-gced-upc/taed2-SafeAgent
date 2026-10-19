@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 from tempfile import TemporaryDirectory
 from time import perf_counter, time
+from typing import Any
 
 import numpy as np
 import torch
@@ -69,6 +70,12 @@ def validate_settings(settings):
         raise ValueError("Training settings must be positive")
     if not 0 <= settings["warmup_ratio"] <= 1 or settings["weight_decay"] < 0:
         raise ValueError("Invalid warmup or weight decay")
+    if "class_weights" in settings and settings["class_weights"] is not None:
+        weights = settings["class_weights"]
+        if not isinstance(weights, list) or len(weights) != len(LABELS):
+            raise ValueError(f"class_weights must be a list of length {len(LABELS)}")
+        if any(w <= 0 for w in weights):
+            raise ValueError("All class weights must be positive")
 
 
 def training_arguments(settings, directory, cpu):
@@ -82,6 +89,7 @@ def training_arguments(settings, directory, cpu):
         warmup_ratio=settings["warmup_ratio"],
         weight_decay=settings["weight_decay"],
         gradient_checkpointing=settings["gradient_checkpointing"],
+        lr_scheduler_type=settings.get("lr_scheduler_type", "linear"),
         seed=settings["seed"],
         data_seed=settings["seed"],
         eval_strategy="epoch",
@@ -97,6 +105,34 @@ def training_arguments(settings, directory, cpu):
         dataloader_num_workers=0,
         disable_tqdm=True,
     )
+
+
+class WeightedTrainer(Trainer):
+    """Trainer that applies class weights to CrossEntropyLoss."""
+
+    def __init__(self, *args, class_weights: torch.Tensor | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(
+        self,
+        model: torch.nn.Module,
+        inputs: dict[str, torch.Tensor | Any],
+        return_outputs: bool = False,
+        num_items_in_batch: torch.Tensor | None = None,
+    ):
+        if self.class_weights is None:
+            return super().compute_loss(
+                model, inputs, return_outputs=return_outputs, num_items_in_batch=num_items_in_batch
+            )
+        labels = inputs.get("labels")
+        outputs = model(**inputs)
+        logits = outputs.get("logits") if isinstance(outputs, dict) else outputs[1]
+        loss_fct = torch.nn.CrossEntropyLoss(weight=self.class_weights.to(logits.device))
+        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
+        if self.args.average_tokens_across_devices and num_items_in_batch is not None:
+            loss *= self.accelerator.num_processes if self.args.n_gpu <= 1 else self.args.n_gpu
+        return (loss, outputs) if return_outputs else loss
 
 
 def prepared_inputs(params, root):
@@ -165,7 +201,8 @@ def save_validation(trainer, examples, rows, output):
     return metrics
 
 
-def fit_encoder(params_path, name, mode, output, allow_cpu=False):
+# pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-statements
+def fit_encoder(params_path, name, mode, output, variant=None, allow_cpu=False):
     if mode not in {"command", "command-context"}:
         raise ValueError("Use command or command with context inputs")
     params_path = Path(params_path).resolve()
@@ -174,7 +211,12 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
         raise ValueError("Use a new output directory to preserve existing results")
     params = load_params(params_path)
     backbone = params["encoders"]["backbones"][name]
-    settings = params["encoders"]["training"]
+    if variant:
+        if "variants" not in params["encoders"] or variant not in params["encoders"]["variants"]:
+            raise ValueError(f"Variant '{variant}' not found in approved variants")
+        settings = params["encoders"]["variants"][variant]
+    else:
+        settings = params["encoders"]["training"]
     validate_settings(settings)
     cpu = not torch.cuda.is_available()
     if cpu and not allow_cpu:
@@ -195,6 +237,7 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
     (output / "params.yaml").write_bytes(params_path.read_bytes())
     metadata = {
         "model": name,
+        "variant": variant,
         "parameters": sum(parameter.numel() for parameter in model.parameters()),
         "backbone": backbone,
         "input_mode": mode,
@@ -212,8 +255,12 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
             package: version(package) for package in ("torch", "transformers", "accelerate")
         },
     }
+    weights = None
+    if settings.get("class_weights") is not None:
+        weights = torch.tensor(settings["class_weights"], dtype=torch.float32)
+
     with TemporaryDirectory(prefix="safeagent-checkpoints-") as checkpoints:
-        trainer = Trainer(
+        trainer = WeightedTrainer(
             model=model,
             args=training_arguments(settings, checkpoints, cpu),
             train_dataset=training,
@@ -221,6 +268,7 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
             processing_class=tokenizer,
             data_collator=DataCollatorWithPadding(tokenizer, pad_to_multiple_of=8),
             compute_metrics=validation_metrics,
+            class_weights=weights,
         )
         metadata["start_time_ms"] = int(time() * 1000)
         started = perf_counter()
@@ -242,16 +290,18 @@ def fit_encoder(params_path, name, mode, output, allow_cpu=False):
     return metrics
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 @app.command()
 def main(
     model: str,
     output: Path,
     mode: str = "command",
+    variant: str | None = None,
     params: Path = Path("params.yaml"),
     allow_cpu: bool = False,
 ):
     try:
-        metrics = fit_encoder(params, model, mode, output, allow_cpu)
+        metrics = fit_encoder(params, model, mode, output, variant, allow_cpu)
     except (ValueError, TypeError, KeyError, OSError, RuntimeError) as error:
         typer.echo(f"Encoder training failed: {error}", err=True)
         raise typer.Exit(1) from None
