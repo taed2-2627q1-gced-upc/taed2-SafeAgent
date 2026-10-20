@@ -1,9 +1,27 @@
 # Virtech deployment and runtime guide
 
-This guide documents the setup, runtime environment, and model deployment on
-**Virtech** (the private OpenNebula cloud of the Facultat d'Informàtica de Barcelona, UPC).
-It details how to provision the virtual machine, configure DVC remote authentication
-without committing secrets, install frozen dependencies, and serve the SafeAgent API.
+This guide documents the setup, runtime environment, model selection, service lifecycle,
+and smoke testing for the **SafeAgent API** deployed on **Virtech** (the private OpenNebula
+cloud of the Facultat d'Informàtica de Barcelona, UPC).
+
+## Model selection rationale
+
+For the Virtech deployment and live API demonstration, the team selected the
+**Character TF-IDF + Linear SVM baseline (`models/tfidf_char_linear_svm`)**.
+
+While neural transformer models (such as ModernBERT-base with execution context) achieved
+stronger contextual accuracy during offline GPU experiments, their forward pass on a
+single CPU without hardware acceleration incurs multi-second latency per request. Because
+shell safety filtering requires immediate real-time feedback (sub-100 ms target) and the
+Virtech VM is allocated a single vCPU without a GPU, the lightweight linear SVM model is
+the technically sound choice:
+
+* **CPU inference latency**: < 5 ms per request.
+* **Memory footprint**: < 50 MB RAM for model weights and vocabulary.
+* **Dependency overhead**: Pure scikit-learn pipeline, avoiding PyTorch/CUDA runtime overhead.
+
+The full experimental comparison, contextual trade-offs, and environmental metrics are
+analyzed in the project report.
 
 ## Infrastructure and network architecture
 
@@ -85,66 +103,76 @@ export AWS_SECRET_ACCESS_KEY="<DAGSHUB_TOKEN>"
 
 Then run `uv run --frozen --group data dvc pull models/tfidf_char_linear_svm`.
 
-## Step 4: Running the API service
+## Step 4: Service lifecycle management (start and restart)
 
-Run the Uvicorn server bound to all interfaces on port `8080`:
+SafeAgent provides `scripts/api_service.sh` for process lifecycle management on the VM,
+tracking the PID in `api.pid` and streaming server output to `api.log`.
 
+### Start the API service
 ```bash
-bash scripts/run_api.sh
+bash scripts/api_service.sh start
+```
+Starts Uvicorn in the background bound to `0.0.0.0:8080`, validates startup, and logs output.
+
+### Check service status
+```bash
+bash scripts/api_service.sh status
+```
+Reports the active PID, port, and checks the local `/health` endpoint.
+
+### Restart the service
+```bash
+bash scripts/api_service.sh restart
+```
+Gracefully terminates the existing server process and starts a fresh instance.
+
+### Stop the service
+```bash
+bash scripts/api_service.sh stop
 ```
 
-Or manually:
+## Step 5: Smoke testing and client verification
+
+A dedicated smoke test client (`scripts/smoke_test.py`) verifies that the deployed API
+correctly implements the HTTP contract for both **valid** and **invalid** requests.
+
+From an external client machine (e.g. developer laptop):
 
 ```bash
-uv run --frozen uvicorn taed2_safeagent.api.app:app --host 0.0.0.0 --port 8080
+python scripts/smoke_test.py --url http://nattech.fib.upc.edu:40XXX0
 ```
 
-### Running as a background service
-To keep the service running after disconnecting from SSH, use `nohup` or `tmux`:
+### Verification scenarios covered
+
+The suite executes 11 distinct checks:
+1. **Service root (`GET /`)**: Validates HTTP 200 and `{"service": "SafeAgent"}` response.
+2. **Liveness check (`GET /health`)**: Validates HTTP 200 and `{"status": "alive"}`.
+3. **Readiness probe (`GET /ready`)**: Validates HTTP 200 and loaded model metadata (`model_version`).
+4. **Valid benign command (`POST /predict`)**: Submits `git status`, verifying HTTP 200 and a valid label (`ALLOW` / `ASK`).
+5. **Valid dangerous command (`POST /predict`)**: Submits `rm -rf /`, verifying HTTP 200 and `DENY` label.
+6. **Valid command with context (`POST /predict`)**: Submits command with `cwd` and `lastUserPrompt`.
+7. **Invalid command (empty string)**: Submits `{"command": ""}`, verifying HTTP 422 Unprocessable Entity.
+8. **Invalid command (whitespace only)**: Submits `{"command": "   "}`, verifying HTTP 422.
+9. **Invalid command (type mismatch)**: Submits numeric command `{"command": 12345}`, verifying HTTP 422.
+10. **Invalid payload (unknown fields)**: Submits unsupported payload fields, verifying strict schema rejection (HTTP 422).
+11. **Non-existent endpoint (`GET /nonexistent`)**: Verifies standard HTTP 404 response.
+
+### Manual curl examples
 
 ```bash
-nohup bash scripts/run_api.sh > api.log 2>&1 &
-```
-
-To stop or restart:
-
-```bash
-# Find and terminate process
-pkill -f uvicorn
-# Restart
-nohup bash scripts/run_api.sh > api.log 2>&1 &
-```
-
-## Step 5: Verification and smoke testing
-
-From any external machine connected to the internet (no VPN required):
-
-### Health check
-```bash
+# Health probe
 curl http://nattech.fib.upc.edu:40XXX0/health
-```
-Expected response:
-```json
-{"status":"healthy"}
-```
 
-### Readiness check
-```bash
+# Readiness probe
 curl http://nattech.fib.upc.edu:40XXX0/ready
-```
-Expected response:
-```json
-{"status":"ready","model":"tfidf_char_linear_svm","model_version":"sha256:...","input_mode":"command"}
-```
 
-### Prediction smoke test
-```bash
+# Prediction check
 curl -X POST http://nattech.fib.upc.edu:40XXX0/predict \
   -H "Content-Type: application/json" \
   -d '{"command": "rm -rf /"}'
-```
-Expected response:
-```json
-{"label":"DENY","model":"tfidf_char_linear_svm","model_version":"sha256:...","input_mode":"command"}
-```
 
+# Rejection of empty command (422)
+curl -s -o /dev/null -w "%{http_code}\n" -X POST http://nattech.fib.upc.edu:40XXX0/predict \
+  -H "Content-Type: application/json" \
+  -d '{"command": ""}'
+```
