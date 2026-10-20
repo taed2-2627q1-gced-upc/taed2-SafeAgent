@@ -1,14 +1,15 @@
+import json
+import os
+from pathlib import Path
+import time
 
+import numpy as np
+import pandas as pd
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
 from taed2_safeagent.config import MODEL_NAMES
-import os
-import pandas as pd
-from pathlib import Path
 from taed2_safeagent.data.inputs import build_input
-import time
-import numpy as np
-import json
 
 torch.set_num_threads(os.cpu_count() or 4)
 
@@ -32,7 +33,6 @@ sample_inputs = {
 }
 
 
-
 for model_name in MODEL_NAMES:
     print("\nEvaluating model:", model_name)
     model_dir = project_root / "models/encoders/" / model_name
@@ -42,12 +42,11 @@ for model_name in MODEL_NAMES:
     input_type = "command-context" if "context" in model_name else "command"
     inputs = tokenizer(
         sample_inputs[input_type],
-        padding="longest", #Antes era True pero tardaba mucho
+        padding="longest",  # Antes era True pero tardaba mucho
         truncation=True,
         max_length=512,
-        return_tensors="pt"
+        return_tensors="pt",
     ).to("cpu")
-
 
     # Cargar modelo y ver cuánto se tarda en ello
     start = time.perf_counter()
@@ -56,14 +55,14 @@ for model_name in MODEL_NAMES:
     model.eval()
 
     # Medir cuánto ocupa
-    model_size_mb = sum(
-        f.stat().st_size for f in model_dir.rglob("*") if f.is_file()
-    ) / (1024 * 1024)
+    model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (
+        1024 * 1024
+    )
 
     # Warm-up
     with torch.no_grad():
         _ = model(**inputs)
-    
+
     # Evaluar con todos los inputs durante repetition_count repeticiones
     latencies_list = []
     for i in range(repetition_count):
@@ -72,11 +71,10 @@ for model_name in MODEL_NAMES:
         with torch.no_grad():
             _ = model(**inputs)
         t1 = time.perf_counter()
-        
+
         # Guardar y convertir a ms
         latencies_list.append((t1 - t0) * 1000.0)
         print(f" - Latency: {latencies_list[-1]:.2f} ms")
-
 
     cpu_metrics[model_name] = {
         "input_type": input_type,
@@ -88,11 +86,10 @@ for model_name in MODEL_NAMES:
     }
 
 
-
-
-'''Inferencia para el modelo baseline'''
+"""Inferencia para el modelo baseline"""
 
 import joblib
+
 model_dir = project_root / "models/tfidf_char_linear_svm"
 model_name = "tfidf_char_linear_svm"
 
@@ -104,9 +101,7 @@ pipeline = joblib.load(model_dir / "pipeline.joblib")
 load_time = time.perf_counter() - start
 
 # Medir cuánto ocupa
-model_size_mb = sum(
-    f.stat().st_size for f in model_dir.rglob("*") if f.is_file()
-) / (1024 * 1024)
+model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (1024 * 1024)
 
 
 # Evaluar con todos los inputs durante repetition_count repeticiones
@@ -116,7 +111,7 @@ for i in range(repetition_count):
     t0 = time.perf_counter()
     predicted_labels = pipeline.predict(sample_inputs["command"])
     t1 = time.perf_counter()
-    
+
     # Guardar y convertir a ms
     latencies_list.append((t1 - t0) * 1000.0)
     print(f" - Latency: {latencies_list[-1]:.2f} ms")
@@ -130,7 +125,6 @@ cpu_metrics[model_name] = {
     "p95_latency_ms": float(np.percentile(latencies_list, 95)),
     "repetition_count": repetition_count,
 }
-
 
 
 output_path = Path(__file__).parent / "cpu_metrics.json"
