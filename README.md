@@ -54,7 +54,43 @@ Use dvc repro validate when only the data is needed.
 ## Command API
 
 The [API guide](docs/api.md) explains how to serve the saved baseline through
-FastAPI, validate one command per request and run the HTTP tests.
+FastAPI, validate one command per request and run the HTTP tests. The
+[deployment guide](docs/deployment.md) documents running the service on the
+Virtech private cloud.
+
+## Energy consumption and emissions
+
+Training and inference energy are tracked with [CodeCarbon](https://codecarbon.io/)
+to quantify computational resource usage and environmental impact across the baseline
+and candidate encoder architectures. CodeCarbon kilogram readings are converted to grams
+(g CO2eq) for readability:
+
+### Training energy by model
+
+| Model | Input mode | Hardware | Duration | Energy (kWh) | Emissions (g CO2eq) | MLflow run |
+| --- | --- | --- | --- | --- | --- | --- |
+| **TF-IDF + Linear SVM** | `command` | CPU (WSL2) | 6.68s | 0.0001 kWh | 0.036 g | [`80c83cb3`](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/80c83cb3105a428db83b5038ab37c0ec) |
+| **CodeBERT-base** | `command` | 2 x Tesla T4 | 478.78s | 0.0156 kWh | 5.780 g | [`a81f878b`](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/a81f878bbbff4019b032b389a0909c01) |
+| **CodeBERT-base** | `command-context` | 2 x Tesla T4 | 834.08s | 0.0273 kWh | 10.073 g | [`c3532eb8`](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/c3532eb8a9c34146926bc9d2e10d047a) |
+| **ModernBERT-base** | `command` | 2 x Tesla T4 | 791.29s | 0.0259 kWh | 9.555 g | [`4851c0df`](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/4851c0df192344fa99eacf1721bdbafe) |
+| **ModernBERT-base** | `command-context` | 2 x Tesla T4 | 1353.73s | 0.0443 kWh | 16.380 g | [`5ed5c367`](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow/#/experiments/1/runs/5ed5c367a6c8481d93a744ce97e7a7b0) |
+
+### CPU inference energy (1 vCPU benchmark)
+
+Inference efficiency was evaluated on a controlled validation batch under single-thread
+CPU execution to model the Virtech deployment environment:
+
+| Model | Input mode | Latency (p50) | Energy / query | Emissions / query | Scope / Status |
+| --- | --- | --- | --- | --- | --- |
+| **TF-IDF + Linear SVM** | `command` | **0.45 ms** | **0.000004 Wh** | **0.0016 mg** | Measured (500 queries) |
+| **CodeBERT-base** | `command` | 831.00 ms | 0.0148 Wh | 5.642 mg | D4 latency estimate |
+| **CodeBERT-base** | `command-context` | 12,639.40 ms | 0.2249 Wh | 85.458 mg | D4 latency estimate |
+| **ModernBERT-base** | `command` | 5,390.19 ms | 0.0964 Wh | 36.617 mg | D4 latency estimate |
+| **ModernBERT-base** | `command-context` | 616.88 ms | 0.0070 Wh | 2.597 mg | Measured (controlled batch) |
+
+The linear SVM baseline demonstrates orders-of-magnitude lower energy consumption and
+latency per query on CPU, making it the most energy-efficient choice for real-time edge
+or CPU cloud serving. Detailed metrics are preserved in `reports/inference/energy.json`.
 
 ## Project layout
 
