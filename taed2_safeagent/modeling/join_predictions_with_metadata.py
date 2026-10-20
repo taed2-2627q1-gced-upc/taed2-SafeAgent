@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from taed2_safeagent.config import PROJ_ROOT
+from taed2_safeagent.config import PROJ_ROOT, MODEL_NAMES
 
 
 def main():
