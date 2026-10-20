@@ -1,19 +1,19 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import joblib
 import pandas as pd
-import torch
 from sklearn.metrics import precision_recall_fscore_support
+import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from taed2_safeagent.config import MODEL_NAMES, PROJ_ROOT
 from taed2_safeagent.data.inputs import build_input
 
 
-def compute_metrics(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_metrics(df: pd.DataFrame) -> dict[str, Any]:
     """Calcula las métricas de evaluación para las 3 clases (ALLOW, DENY, ASK)."""
     y_true = df["true_label"]
     y_pred = df["predicted_label"]
@@ -23,9 +23,7 @@ def compute_metrics(df: pd.DataFrame) -> Dict[str, Any]:
     accuracy = float((y_true == y_pred).mean())
 
     labels = ["DENY", "ASK", "ALLOW"]
-    p, r, f1, _ = precision_recall_fscore_support(
-        y_true, y_pred, labels=labels, zero_division=0
-    )
+    p, r, f1, _ = precision_recall_fscore_support(y_true, y_pred, labels=labels, zero_division=0)
 
     metrics = {
         "count": count,
@@ -46,8 +44,7 @@ def compute_metrics(df: pd.DataFrame) -> Dict[str, Any]:
 
 def evaluate_transformer(
     model_name: str, test_df: pd.DataFrame, output_prefix: str, batch_size: int = 32
-    ) -> Dict[str, Any]:
-    
+) -> dict[str, Any]:
     """Ejecuta inferencia por batches en CPU para evitar cuelgues."""
     model_dir = PROJ_ROOT / "models" / "encoders" / model_name
     if not model_dir.exists():
@@ -60,7 +57,7 @@ def evaluate_transformer(
     model.eval()
 
     input_type = "command-context" if "context" in model_name else "command"
-    text_inputs: List[str] = [
+    text_inputs: list[str] = [
         build_input(row, input_type) for row in test_df.to_dict(orient="records")
     ]
 
@@ -83,7 +80,10 @@ def evaluate_transformer(
             preds = torch.argmax(outputs.logits, dim=-1).cpu().numpy()
             all_preds.extend(preds)
 
-            print(f" - Procesados {min(i + batch_size, total_samples)}/{total_samples} ejemplos...", end="\r")
+            print(
+                f" - Procesados {min(i + batch_size, total_samples)}/{total_samples} ejemplos...",
+                end="\r",
+            )
 
     print("\n - Inferencia completada. Mapeando etiquetas...")
 
@@ -92,9 +92,7 @@ def evaluate_transformer(
     predicted_labels = [id2label.get(int(p), str(p)) for p in all_preds]
 
     res_df = (
-        test_df[["id", "label"]].copy()
-        if "label" in test_df.columns
-        else test_df[["id"]].copy()
+        test_df[["id", "label"]].copy() if "label" in test_df.columns else test_df[["id"]].copy()
     )
     res_df.rename(columns={"label": "true_label"}, inplace=True)
     res_df["predicted_label"] = predicted_labels
@@ -112,7 +110,7 @@ def evaluate_transformer(
     return metrics
 
 
-def evaluate_baseline(test_df: pd.DataFrame, output_prefix: str) -> Dict[str, Any]:
+def evaluate_baseline(test_df: pd.DataFrame, output_prefix: str) -> dict[str, Any]:
     """Ejecuta inferencia con baseline Scikit-Learn."""
     model_dir = PROJ_ROOT / "models" / "tfidf_char_linear_svm"
     pipeline_path = model_dir / "pipeline.joblib"
@@ -120,18 +118,16 @@ def evaluate_baseline(test_df: pd.DataFrame, output_prefix: str) -> Dict[str, An
         print(f"\nSkipping Baseline: {pipeline_path} not found.")
         return {}
 
-    print(f"\n[Evaluando Baseline: tfidf_char_linear_svm]")
+    print("\n[Evaluando Baseline: tfidf_char_linear_svm]")
     pipeline = joblib.load(pipeline_path)
 
-    text_inputs: List[str] = [
+    text_inputs: list[str] = [
         build_input(row, "command") for row in test_df.to_dict(orient="records")
     ]
     preds = pipeline.predict(text_inputs)
 
     res_df = (
-        test_df[["id", "label"]].copy()
-        if "label" in test_df.columns
-        else test_df[["id"]].copy()
+        test_df[["id", "label"]].copy() if "label" in test_df.columns else test_df[["id"]].copy()
     )
     res_df.rename(columns={"label": "true_label"}, inplace=True)
     res_df["predicted_label"] = preds
