@@ -85,7 +85,7 @@ def main():
         with open(output_metrics_path, "w", encoding="utf-8") as f:
             json.dump(model_results, f, indent=4)
 
-        print(f"Results from model {model_name} were saved on ")
+        print(f"Results from model {model_name} were saved on {output_metrics_path}")
 
 
 if __name__ == "__main__":
