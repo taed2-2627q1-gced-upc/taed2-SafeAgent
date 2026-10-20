@@ -9,17 +9,19 @@ from taed2_safeagent.data.common import LABELS, load_params, read_jsonl
 from taed2_safeagent.data.inputs import build_input, example_id, safe_context
 
 
-def load_config(path):
+def load_config(path, config_key="baseline"):
     path = Path(path).resolve()
     params = load_params(path)
-    settings = params["baseline"]
+    if config_key not in params:
+        raise ValueError(f"Configuration key not found in parameters: {config_key}")
+    settings = params[config_key]
     if settings["input_mode"] != "command":
-        raise ValueError("This baseline uses command inputs only")
+        raise ValueError(f"Section '{config_key}' uses command inputs only")
     for field, folder in (("model_dir", "models"), ("report_dir", "reports")):
         target = (path.parent / settings[field]).resolve()
         parent = path.parent / folder
         if not target.is_relative_to(parent) or target == parent:
-            raise ValueError(f"Invalid baseline output path: {field}")
+            raise ValueError(f"Invalid {config_key} output path: {field}")
         settings[field] = target
     return params
 

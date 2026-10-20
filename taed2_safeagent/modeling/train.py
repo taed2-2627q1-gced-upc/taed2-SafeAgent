@@ -40,12 +40,13 @@ def fit_pipeline(texts, labels, settings):
     return pipeline
 
 
-def train(params, split=None):
-    settings = params["baseline"]
+def train(params, config_key="baseline", split=None):
+    settings = params[config_key]
     dataset_split = split or settings.get("split", "train")
     rows = load_examples(params, dataset_split, allow_test=(dataset_split in {"test", "all"}))
     identity = dataset_identity(params)
-    texts = [build_input(row, "command") for row in rows]
+    input_mode = settings.get("input_mode", "command")
+    texts = [build_input(row, input_mode) for row in rows]
     labels = [row["label"] for row in rows]
     started = perf_counter()
     if "energy" in params:
@@ -57,8 +58,8 @@ def train(params, split=None):
     elapsed = perf_counter() - started
 
     metadata = {
-        "model": "tfidf_char_linear_svm",
-        "input_mode": "command",
+        "model": settings.get("model_name", "tfidf_char_linear_svm"),
+        "input_mode": input_mode,
         "labels": list(LABELS),
         "settings": {key: settings[key] for key in ("tfidf", "svm")},
         "dataset": identity,
@@ -80,17 +81,22 @@ def train(params, split=None):
 @app.command()
 def main(
     params: Path = Path("params.yaml"),
+    config_key: str = typer.Option(
+        "baseline",
+        "--config-key",
+        help="Configuration section in params.yaml ('baseline', 'vm_deployment')",
+    ),
     split: str = typer.Option(
         None, "--split", help="Dataset split to train on ('train', 'validation', 'all')"
     ),
 ):
     try:
-        config = load_config(params)
-        result = train(config, split=split)
+        config = load_config(params, config_key=config_key)
+        result = train(config, config_key=config_key, split=split)
     except (ValueError, TypeError, FileNotFoundError) as error:
         typer.echo(f"Training failed: {error}", err=True)
         raise typer.Exit(1) from error
-    typer.echo(f"Baseline trained on {result['train_rows']} examples")
+    typer.echo(f"Model '{result['model']}' trained on {result['train_rows']} examples")
 
 
 if __name__ == "__main__":

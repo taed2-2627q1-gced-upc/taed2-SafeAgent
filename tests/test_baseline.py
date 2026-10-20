@@ -211,3 +211,16 @@ def test_train_full_dataset_loads_all_splits(baseline_params):
     val_rows = len(load_examples(baseline_params, "validation"))
     test_rows = len(load_examples(baseline_params, "test", allow_test=True))
     assert metadata["train_rows"] == train_rows + val_rows + test_rows
+
+
+def test_train_vm_deployment_creates_model(baseline_params, tmp_path):
+    params = deepcopy(baseline_params)
+    params["vm_deployment"] = deepcopy(params["baseline"])
+    params["vm_deployment"]["model_name"] = "vm_linear_svm"
+    params["vm_deployment"]["model_dir"] = tmp_path / "models" / "vm_linear_svm"
+    params["vm_deployment"]["report_dir"] = tmp_path / "reports" / "vm_deployment"
+    params["vm_deployment"]["split"] = "all"
+    metadata = train(params, config_key="vm_deployment")
+    assert metadata["model"] == "vm_linear_svm"
+    assert (params["vm_deployment"]["model_dir"] / "pipeline.joblib").is_file()
+    assert (params["vm_deployment"]["report_dir"] / "energy.json").is_file()

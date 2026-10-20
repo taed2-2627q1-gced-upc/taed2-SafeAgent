@@ -7,7 +7,7 @@ cloud of the Facultat d'Informàtica de Barcelona, UPC).
 ## Model selection rationale
 
 For the Virtech deployment and live API demonstration, the team selected the
-**Character TF-IDF + Linear SVM baseline (`models/tfidf_char_linear_svm`)**.
+**Safety-Calibrated Linear SVM (`models/vm_linear_svm`)**, trained on the complete dataset ($N = 33,325$).
 
 While neural transformer models (such as ModernBERT-base with execution context) achieved
 stronger contextual accuracy during offline GPU experiments, their forward pass on a
@@ -75,7 +75,7 @@ The script will:
 1. Verify and install `uv` into `$HOME/.local/bin`.
 2. Run `uv sync --frozen --group data` to download CPython 3.11 and create the exact locked virtual environment.
 3. Configure DVC storage credentials securely (see below).
-4. Run `dvc pull models/tfidf_char_linear_svm` to retrieve the trained model weights.
+4. Run `dvc pull models/vm_linear_svm` to retrieve the trained model weights.
 5. Validate that `taed2_safeagent.api.model.load_predictor()` initializes cleanly.
 
 ## Step 3: Secure DVC credential management
@@ -101,7 +101,7 @@ export AWS_ACCESS_KEY_ID="<DAGSHUB_TOKEN>"
 export AWS_SECRET_ACCESS_KEY="<DAGSHUB_TOKEN>"
 ```
 
-Then run `uv run --frozen --group data dvc pull models/tfidf_char_linear_svm`.
+Then run `uv run --frozen --group data dvc pull models/vm_linear_svm`.
 
 ## Step 4: Service lifecycle management (start and restart)
 

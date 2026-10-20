@@ -342,18 +342,10 @@ stages:
       hash: md5
       md5: 324b4c319c992f8fc2edf5ea932a9716
       size: 1122
-    - path: data/processed/shell_safety/test.jsonl
-      hash: md5
-      md5: 72a290642a7825ae2418a7cc8e804596
-      size: 2204558
     - path: data/processed/shell_safety/train.jsonl
       hash: md5
       md5: 287a9060dcf23b8e13856e5059153562
       size: 17796175
-    - path: data/processed/shell_safety/validation.jsonl
-      hash: md5
-      md5: 4587e01ad1c12ddb2c50ebbe6d54d242
-      size: 2248857
     - path: pyproject.toml
       hash: md5
       md5: d8afbbcc033709b665d38495e4b7f471
@@ -396,16 +388,16 @@ stages:
       size: 2649
     - path: taed2_safeagent/modeling/common.py
       hash: md5
-      md5: 9cbc8b23eca9872f4d2c6dd67879e2b3
-      size: 4284
+      md5: 5d4833cfacc5d011945ca961ca391ece
+      size: 4439
     - path: taed2_safeagent/modeling/energy.py
       hash: md5
       md5: 3ae1a0f12970e3c3788a99ccce79a8c4
       size: 1697
     - path: taed2_safeagent/modeling/train.py
       hash: md5
-      md5: 49ab8999a76063a377d134ffb860397b
-      size: 3341
+      md5: cd0b3c964d8997d6be21f607f77a8096
+      size: 3682
     - path: uv.lock
       hash: md5
       md5: 0d1c983f1027daac9c1dda0eb3a33c2b
@@ -415,7 +407,6 @@ stages:
         baseline.input_mode: command
         baseline.model_dir: models/tfidf_char_linear_svm
         baseline.report_dir: reports/baseline
-        baseline.split: all
         baseline.svm:
           C: 1.0
           class_weight: balanced
@@ -490,13 +481,13 @@ stages:
     outs:
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: 4e98338ca57b033a5b565779d699bd23.dir
-      size: 2171396
+      md5: cf660ed8dedae4e9d85d7f5c6f7a9914.dir
+      size: 2149432
       nfiles: 2
     - path: reports/baseline/energy.json
       hash: md5
-      md5: c926e88c3ac66b5e5f601b26f18be918
-      size: 1449
+      md5: 3871f15ed44d597cfbcce96144164263
+      size: 1436
   evaluate:
     cmd: uv run --frozen --group data python -m 
       taed2_safeagent.modeling.evaluate --params params.yaml
@@ -515,8 +506,8 @@ stages:
       size: 2248857
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: 4e98338ca57b033a5b565779d699bd23.dir
-      size: 2171396
+      md5: cf660ed8dedae4e9d85d7f5c6f7a9914.dir
+      size: 2149432
       nfiles: 2
     - path: pyproject.toml
       hash: md5
@@ -560,8 +551,8 @@ stages:
       size: 2649
     - path: taed2_safeagent/modeling/common.py
       hash: md5
-      md5: 9cbc8b23eca9872f4d2c6dd67879e2b3
-      size: 4284
+      md5: 5d4833cfacc5d011945ca961ca391ece
+      size: 4439
     - path: taed2_safeagent/modeling/evaluate.py
       hash: md5
       md5: bffb85e5b310926dbd4bc37c83913765
@@ -628,9 +619,172 @@ stages:
     outs:
     - path: reports/baseline/metrics.json
       hash: md5
-      md5: b22de2470f3a2b9f7cb873350aec9d23
-      size: 958
+      md5: 030063a99820286a47174d54d63e27d2
+      size: 980
     - path: reports/baseline/predictions.jsonl
       hash: md5
-      md5: f280d267f6b8d45362b05a6214dae157
-      size: 396947
+      md5: 02bc7543abb2433eb17ed83d5fd7d19b
+      size: 397118
+  train_vm:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train 
+      --params params.yaml --config-key vm_deployment
+    deps:
+    - path: data/processed/shell_safety/manifest.json
+      hash: md5
+      md5: 324b4c319c992f8fc2edf5ea932a9716
+      size: 1122
+    - path: data/processed/shell_safety/test.jsonl
+      hash: md5
+      md5: 72a290642a7825ae2418a7cc8e804596
+      size: 2204558
+    - path: data/processed/shell_safety/train.jsonl
+      hash: md5
+      md5: 287a9060dcf23b8e13856e5059153562
+      size: 17796175
+    - path: data/processed/shell_safety/validation.jsonl
+      hash: md5
+      md5: 4587e01ad1c12ddb2c50ebbe6d54d242
+      size: 2248857
+    - path: pyproject.toml
+      hash: md5
+      md5: d8afbbcc033709b665d38495e4b7f471
+      size: 1770
+    - path: reports/data/validation.json
+      hash: md5
+      md5: 8419e3861af749f3bd5efc590676c884
+      size: 1332
+    - path: taed2_safeagent/__init__.py
+      hash: md5
+      md5: d5ade148383b76a923eedd59a36ab697
+      size: 49
+    - path: taed2_safeagent/config.py
+      hash: md5
+      md5: 12a42a71315a5cb8309355ea4e608fd7
+      size: 1011
+    - path: taed2_safeagent/data/__init__.py
+      hash: md5
+      md5: 7a60ff429e1ebcaf8e9503adaafd0ba5
+      size: 38
+    - path: taed2_safeagent/data/common.py
+      hash: md5
+      md5: 2f077625e7ecc0590629640989258ee0
+      size: 2623
+    - path: taed2_safeagent/data/inputs.py
+      hash: md5
+      md5: cc1bca44a28be1a67855a03d2f4fc1e1
+      size: 1917
+    - path: taed2_safeagent/features.py
+      hash: md5
+      md5: 760e94623a20bb05fe4a48adf7f7bd2c
+      size: 710
+    - path: taed2_safeagent/modeling/__init__.py
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: taed2_safeagent/modeling/calibrated_svm.py
+      hash: md5
+      md5: 6bc7df5607e9b2995cb6ad52bb9c8d09
+      size: 2649
+    - path: taed2_safeagent/modeling/common.py
+      hash: md5
+      md5: 5d4833cfacc5d011945ca961ca391ece
+      size: 4439
+    - path: taed2_safeagent/modeling/energy.py
+      hash: md5
+      md5: 3ae1a0f12970e3c3788a99ccce79a8c4
+      size: 1697
+    - path: taed2_safeagent/modeling/train.py
+      hash: md5
+      md5: cd0b3c964d8997d6be21f607f77a8096
+      size: 3682
+    - path: uv.lock
+      hash: md5
+      md5: 0d1c983f1027daac9c1dda0eb3a33c2b
+      size: 447564
+    params:
+      params.yaml:
+        context:
+          version: safe_context_v1
+        energy:
+          country_iso_code: USA
+          country_assumed: true
+          measure_power_secs: 5
+          gpu_ids: '0'
+        grouping:
+          version: command_context_v1
+          comment_markers:
+          - wip
+          - quick
+          - tmp
+          - bump
+          - rebuild
+          - after edit
+          - v2
+          - collect logs
+          - smoke
+          - fix lint
+          - fmt
+          ngram_size: 5
+          jaccard_numerator: 9
+          jaccard_denominator: 10
+        paths.processed: data/processed/shell_safety
+        source:
+          repository: tomngdev/shell-safety-v1.1
+          revision: fee89770c315d525ef2ee42adee6ef9725a7621e
+          files:
+            train.jsonl:
+              rows: 30002
+              bytes: 23984713
+              sha256: 
+                698e5ba9cf4984d4fcd845f997e63a8a971ceea71a3b22dcf257379d6e0972ef
+            validation.jsonl:
+              rows: 3002
+              bytes: 2408952
+              sha256: 
+                ebb74c92b5b879d06af75d2cb456feb0f314c2ae270eb9aa79353c67f364e830
+            test.jsonl:
+              rows: 1003
+              bytes: 804564
+              sha256: 
+                23b5c0d32e2d558550b14885580194d3dbb9c4f6810acab14e03d9cdfaa341e8
+            README.md:
+              bytes: 580
+              sha256: 
+                92b4d43f0f167176415220872b0667980a35f68aed5e34f44df837e602ad2455
+        split:
+          seed: 42
+          ratios:
+            train: 0.8
+            validation: 0.1
+            test: 0.1
+          tolerance: 0.01
+        vm_deployment.input_mode: command
+        vm_deployment.model_dir: models/vm_linear_svm
+        vm_deployment.report_dir: reports/vm_deployment
+        vm_deployment.split: all
+        vm_deployment.svm:
+          C: 1.0
+          class_weight: balanced
+          deny_boost: 0.4
+          random_state: 42
+          dual: auto
+          tol: 0.0001
+          max_iter: 10000
+        vm_deployment.tfidf:
+          ngram_range:
+          - 2
+          - 5
+          min_df: 2
+          max_features: 100000
+          sublinear_tf: true
+          norm: l2
+    outs:
+    - path: models/vm_linear_svm
+      hash: md5
+      md5: 4e14e583919ba3fbc2c88640614b4c42.dir
+      size: 2171388
+      nfiles: 2
+    - path: reports/vm_deployment/energy.json
+      hash: md5
+      md5: 1c791a08310df0054f572ee2b8c63c83
+      size: 1431

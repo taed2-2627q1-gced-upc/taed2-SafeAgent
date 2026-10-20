@@ -48,7 +48,7 @@ else
 fi
 
 echo "=== 4. Recovering the model artifact via DVC ==="
-uv run --frozen --group data dvc pull models/tfidf_char_linear_svm
+uv run --frozen --group data dvc pull models/vm_linear_svm
 
 echo "=== 5. Verifying model runtime loading ==="
 uv run --frozen python -c "
