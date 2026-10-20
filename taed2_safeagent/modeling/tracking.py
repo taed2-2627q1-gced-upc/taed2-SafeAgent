@@ -106,19 +106,35 @@ def evaluation_metric_values(metrics):
     return {name: value for name, value in values.items() if value is not None}
 
 
-def metric_values(metadata, metrics):
+def metric_values(metadata, metrics, energy=None):
     values = evaluation_metric_values(metrics)
     values.update(
         {
             key: metadata[key]
             for key in ("training_seconds", "train_rows", "features", "iterations")
-            if metadata[key] is not None
+            if metadata.get(key) is not None
         }
     )
+    if energy and energy.get("status") == "recorded":
+        measurement = energy.get("measurement", {})
+        if "energy_consumed" in measurement:
+            values["energy_kwh"] = measurement["energy_consumed"]
+        if "emissions" in measurement:
+            values["emissions_kg"] = measurement["emissions"]
+        if "duration" in measurement:
+            values["measurement_seconds"] = measurement["duration"]
     return values
 
 
 def log_results(client, run_id, files, metadata, metrics):
+    energy_file = next((Path(f) for f in files if Path(f).name == "energy.json"), None)
+    energy = None
+    if energy_file and energy_file.is_file():
+        try:
+            energy = json.loads(energy_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            energy = None
+
     parameters = {}
     for group, settings in metadata["settings"].items():
         for name, value in settings.items():
@@ -141,13 +157,16 @@ def log_results(client, run_id, files, metadata, metrics):
             **metadata["versions"],
         }
     )
+    if energy and "country_assumed" in energy:
+        parameters["energy_country_assumed"] = energy["country_assumed"]
+
     timestamp = int(time() * 1000)
     client.log_batch(
         run_id,
         params=[Param(name, str(value)) for name, value in parameters.items()],
         metrics=[
             Metric(name, float(value), timestamp, 0)
-            for name, value in metric_values(metadata, metrics).items()
+            for name, value in metric_values(metadata, metrics, energy).items()
         ],
         synchronous=True,
     )
@@ -163,6 +182,7 @@ def log_results(client, run_id, files, metadata, metrics):
 
 
 def mark_failed(client, run_id):
+
     try:
         client.set_terminated(run_id, status="FAILED")
     except (MlflowException, OSError):

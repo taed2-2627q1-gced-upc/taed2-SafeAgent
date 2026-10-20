@@ -1,0 +1,42 @@
+{
+    "codebert__command__2__a740d875": {
+        "input_type": "command",
+        "model_size_mb": 481.5032072067261,
+        "load_time_seconds": 0.40136239997809753,
+        "median_latency_ms": 831.0029999702238,
+        "p95_latency_ms": 866.426279960433,
+        "repetition_count": 3
+    },
+    "codebert__command-context__2__a740d875": {
+        "input_type": "command-context",
+        "model_size_mb": 481.50315952301025,
+        "load_time_seconds": 0.23259860003599897,
+        "median_latency_ms": 12639.398800034542,
+        "p95_latency_ms": 12801.705160003621,
+        "repetition_count": 3
+    },
+    "modernbert__command__2__a740d875": {
+        "input_type": "command",
+        "model_size_mb": 575.5519533157349,
+        "load_time_seconds": 7.778852100018412,
+        "median_latency_ms": 5390.18520002719,
+        "p95_latency_ms": 6105.197760020383,
+        "repetition_count": 3
+    },
+    "modernbert__command-context__2__a740d875": {
+        "input_type": "command-context",
+        "model_size_mb": 575.5516548156738,
+        "load_time_seconds": 0.9209904000163078,
+        "median_latency_ms": 22637.600200017914,
+        "p95_latency_ms": 22932.86427996354,
+        "repetition_count": 3
+    },
+    "tfidf_char_linear_svm": {
+        "input_type": "command",
+        "model_size_mb": 2.02773380279541,
+        "load_time_seconds": 4.90186869999161,
+        "median_latency_ms": 6.079300015699118,
+        "p95_latency_ms": 44.3210199882742,
+        "repetition_count": 3
+    }
+}

@@ -54,7 +54,10 @@ def checked_result(result, params):
         raise ValueError("Unexpected model labels or input mode")
     if metadata["backbone"] != params["encoders"]["backbones"][metadata["model"]]:
         raise ValueError("Backbone differs from the approved configuration")
-    if metadata["settings"] != params["encoders"]["training"]:
+    approved_settings = [params["encoders"]["training"]]
+    if "variants" in params["encoders"]:
+        approved_settings.extend(params["encoders"]["variants"].values())
+    if metadata["settings"] not in approved_settings:
         raise ValueError("Training settings differ from the approved configuration")
     if metadata["dataset"] != dataset_identity(params):
         raise ValueError("Training data differs from the prepared dataset")
@@ -156,7 +159,10 @@ def register_result(params_path, result, session_path):
     registration = code_identity()
     if not registration["commit"] or registration["dirty"] is not False:
         raise ValueError("Commit registration code before uploading results")
-    name = f"{metadata['model']}__{metadata['input_mode']}__{session['kaggle_version']}"
+    variant_part = f"__{metadata['variant']}" if metadata.get("variant") else ""
+    name = (
+        f"{metadata['model']}__{metadata['input_mode']}{variant_part}__{session['kaggle_version']}"
+    )
     name += f"__{metadata['code']['commit'][:8]}"
     target = root / "models/encoders" / name
     report = root / "reports/encoders" / name
@@ -164,12 +170,13 @@ def register_result(params_path, result, session_path):
         raise ValueError("This result already exists, inspect it before another registration")
     client = tracking_client(params["tracking"])
     experiment_id = get_experiment_id(client, params["tracking"]["experiment"])
+    variant_suffix = f"-{metadata['variant']}" if metadata.get("variant") else ""
+    seed = metadata["settings"]["seed"]
+    run_name = f"{metadata['model']}__{metadata['input_mode']}{variant_suffix}__seed{seed}"
     run = client.create_run(
         experiment_id,
         start_time=metadata["start_time_ms"],
-        run_name=(
-            f"{metadata['model']}__{metadata['input_mode']}__seed{metadata['settings']['seed']}"
-        ),
+        run_name=run_name,
         tags={
             "git_commit_sha": metadata["code"]["commit"],
             "git_is_dirty": "false",
@@ -177,6 +184,7 @@ def register_result(params_path, result, session_path):
             "input_dvc_lock_hash": metadata["input_dvc_lock_hash"],
             "model_type": metadata["model"],
             "input_mode": metadata["input_mode"],
+            "variant": metadata.get("variant") or "default",
             "evaluation_split": "validation",
             "kaggle_ref": session["kaggle_ref"],
             "kaggle_version": str(session["kaggle_version"]),

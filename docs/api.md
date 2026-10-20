@@ -1,7 +1,8 @@
 # Command classification API
 
-The API classifies one command per request. It starts with the saved character
-TF-IDF and linear SVM baseline. The final deployment model is still undecided.
+The API classifies one command per request. It serves the character TF-IDF and
+linear SVM model (`models/tfidf_char_linear_svm`), selected for lightweight, low-latency
+CPU inference on the Virtech private cloud (see the [deployment guide](deployment.md)).
 The service never executes submitted commands or trains a model during startup.
 
 ## Run locally
