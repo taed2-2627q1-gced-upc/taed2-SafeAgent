@@ -28,15 +28,11 @@ def main():
     sample_data_path = project_root / "data/processed/shell_safety/test.jsonl"
     df = pd.read_json(sample_data_path, lines=True)
 
-    sample_rows = df.sample(n=ROWS_PER_REPETITION, random_state=42).to_dict(
-        orient="records"
-    )
+    sample_rows = df.sample(n=ROWS_PER_REPETITION, random_state=42).to_dict(orient="records")
 
     sample_inputs = {
         "command": [build_input(row, "command") for row in sample_rows],
-        "command-context": [
-            build_input(row, "command-context") for row in sample_rows
-        ],
+        "command-context": [build_input(row, "command-context") for row in sample_rows],
     }
 
     # ---------------------------------------------------------
@@ -47,9 +43,7 @@ def main():
         model_dir = project_root / "models/encoders" / model_name
 
         tokenizer = AutoTokenizer.from_pretrained(str(model_dir))
-        input_type = (
-            "command-context" if "context" in model_name else "command"
-        )
+        input_type = "command-context" if "context" in model_name else "command"
         inputs = tokenizer(
             sample_inputs[input_type],
             padding="longest",
@@ -59,15 +53,13 @@ def main():
         ).to("cpu")
 
         start = time.perf_counter()
-        model = AutoModelForSequenceClassification.from_pretrained(
-            str(model_dir)
-        ).to("cpu")
+        model = AutoModelForSequenceClassification.from_pretrained(str(model_dir)).to("cpu")
         load_time = time.perf_counter() - start
         model.eval()
 
-        model_size_mb = sum(
-            f.stat().st_size for f in model_dir.rglob("*") if f.is_file()
-        ) / (1024 * 1024)
+        model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (
+            1024 * 1024
+        )
 
         # Warm-up
         with torch.no_grad():
@@ -108,9 +100,9 @@ def main():
     pipeline = joblib.load(model_dir / "pipeline.joblib")
     load_time = time.perf_counter() - start
 
-    model_size_mb = sum(
-        f.stat().st_size for f in model_dir.rglob("*") if f.is_file()
-    ) / (1024 * 1024)
+    model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (
+        1024 * 1024
+    )
 
     # Warm-up
     _ = pipeline.predict(sample_inputs["command"])
