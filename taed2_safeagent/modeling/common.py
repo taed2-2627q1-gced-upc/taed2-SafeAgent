@@ -24,8 +24,9 @@ def load_config(path):
     return params
 
 
-def load_examples(params, split):
-    if split not in {"train", "validation"}:
+def load_examples(params, split, allow_test=False):
+    valid_splits = {"train", "validation", "test"} if allow_test else {"train", "validation"}
+    if split not in valid_splits:
         raise ValueError("Test is reserved for final evaluation")
     path = params["paths"]["processed"] / f"{split}.jsonl"
     rows = [row for _, row in read_jsonl(path)]
