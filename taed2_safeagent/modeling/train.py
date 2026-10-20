@@ -6,12 +6,12 @@ import warnings
 import joblib
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.pipeline import Pipeline
-from sklearn.svm import LinearSVC
 import typer
 
 from taed2_safeagent.data.common import LABELS, write_json
 from taed2_safeagent.data.inputs import build_input
 from taed2_safeagent.features import make_vectorizer
+from taed2_safeagent.modeling.calibrated_svm import SafetyCalibratedLinearSVC
 from taed2_safeagent.modeling.common import (
     code_identity,
     dataset_identity,
@@ -28,7 +28,7 @@ def fit_pipeline(texts, labels, settings):
     pipeline = Pipeline(
         [
             ("tfidf", make_vectorizer(settings["tfidf"])),
-            ("svm", LinearSVC(**settings["svm"])),
+            ("svm", SafetyCalibratedLinearSVC(**settings["svm"])),
         ]
     )
     try:

@@ -86,6 +86,7 @@ stages:
       - ${paths.processed}/manifest.json
       - reports/data/validation.json
       - taed2_safeagent/modeling/train.py
+      - taed2_safeagent/modeling/calibrated_svm.py
       - taed2_safeagent/modeling/energy.py
       - taed2_safeagent/config.py
       - taed2_safeagent/modeling/common.py
@@ -124,6 +125,7 @@ stages:
       - ${paths.processed}/manifest.json
       - reports/data/validation.json
       - taed2_safeagent/modeling/evaluate.py
+      - taed2_safeagent/modeling/calibrated_svm.py
       - taed2_safeagent/config.py
       - taed2_safeagent/modeling/common.py
       - taed2_safeagent/modeling/__init__.py
