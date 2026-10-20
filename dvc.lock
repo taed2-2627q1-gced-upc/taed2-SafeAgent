@@ -490,13 +490,13 @@ stages:
     outs:
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: 6d2195c8011c9967d8251ad7e87c4c2d.dir
+      md5: 4e98338ca57b033a5b565779d699bd23.dir
       size: 2171396
       nfiles: 2
     - path: reports/baseline/energy.json
       hash: md5
-      md5: 7a9bc1fce400f03ee1b46a28da3032d8
-      size: 1423
+      md5: c926e88c3ac66b5e5f601b26f18be918
+      size: 1449
   evaluate:
     cmd: uv run --frozen --group data python -m 
       taed2_safeagent.modeling.evaluate --params params.yaml
@@ -515,7 +515,7 @@ stages:
       size: 2248857
     - path: models/tfidf_char_linear_svm
       hash: md5
-      md5: 6d2195c8011c9967d8251ad7e87c4c2d.dir
+      md5: 4e98338ca57b033a5b565779d699bd23.dir
       size: 2171396
       nfiles: 2
     - path: pyproject.toml
