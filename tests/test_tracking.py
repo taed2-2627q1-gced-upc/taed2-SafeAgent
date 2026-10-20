@@ -106,6 +106,7 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     assert settings["svm.random_state"] == "42"
     assert settings["tfidf.ngram_range"] == "[2, 5]"
     assert settings["input_mode"] == "command"
+    assert settings["energy_country_assumed"] == "True"
     artifacts = {Path(call.args[1]).name for call in client.log_artifact.call_args_list}
     assert artifacts == {
         "input_dvc.lock",
@@ -113,6 +114,7 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
         "dvc.lock",
         "metrics.json",
         "predictions.jsonl",
+        "energy.json",
     }
     assert "test_secret" not in str(settings)
     assert "test_secret" not in str(client.log_dict.call_args_list)
@@ -123,7 +125,40 @@ def test_shared_run_records_real_outputs_and_model_version(tracked_run):
     client.set_terminated.assert_called_once_with("run42", status="FINISHED")
 
 
+def test_metric_values_includes_recorded_energy():
+    metadata = {
+        "training_seconds": 12.5,
+        "train_rows": 100,
+        "features": 50,
+        "iterations": 10,
+    }
+    metrics = {
+        "accuracy": 0.9,
+        "balanced_accuracy": 0.9,
+        "macro_f1": 0.88,
+        "deny_to_allow_count": 0,
+        "deny_to_allow_rate": 0.0,
+        "classes": {
+            label: {"precision": 0.9, "recall": 0.9, "f1-score": 0.9, "support": 30}
+            for label in ("ALLOW", "ASK", "DENY")
+        },
+    }
+    energy = {
+        "status": "recorded",
+        "measurement": {
+            "energy_consumed": 0.0042,
+            "emissions": 0.0015,
+            "duration": 12.3,
+        },
+    }
+    values = tracking.metric_values(metadata, metrics, energy)
+    assert values["energy_kwh"] == 0.0042
+    assert values["emissions_kg"] == 0.0015
+    assert values["measurement_seconds"] == 12.3
+
+
 @pytest.mark.parametrize("content", [b"stages: {}\n", b"stages: {}\r\n"])
+
 def test_input_lock_artifact_preserves_recorded_bytes(content):
     client = Mock(spec=MlflowClient)
     uploaded = []

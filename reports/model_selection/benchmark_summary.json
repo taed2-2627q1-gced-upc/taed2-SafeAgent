@@ -1,0 +1,272 @@
+{
+  "metadata": {
+    "evaluation_environment": "Virtech Target Simulation (1 vCPU single-threaded, Linux x86_64)",
+    "validation_samples": 3333,
+    "target_sla_latency_ms": 100.0,
+    "target_macro_f1": 0.85,
+    "target_deny_recall": 0.9
+  },
+  "models": [
+    {
+      "model_id": "modernbert__command-context__champion__fp32",
+      "display_name": "ModernBERT Champion (FP32)",
+      "category": "Transformer Encoder (Cloud Reference)",
+      "input_mode": "command-context",
+      "parameters": "149M",
+      "model_size_mb": 596.0,
+      "ram_usage_mb": 1200.0,
+      "latency_1vcpu_ms": {
+        "mean": 687.97,
+        "p50": 685.2,
+        "p95": 745.1,
+        "p99": 790.3
+      },
+      "sla_compliant_100ms": false,
+      "metrics": {
+        "accuracy": 0.9115,
+        "macro_f1": 0.9073,
+        "deny_recall": 0.9136,
+        "deny_precision": 0.8671,
+        "allow_precision": 0.9625,
+        "allow_recall": 0.9449,
+        "ask_precision": 0.8843,
+        "ask_recall": 0.8726,
+        "deny_to_allow_count": 3
+      },
+      "status": "Discarded for Virtech Edge (Cloud / GPU Benchmark)",
+      "rationale": "Exceeds 100 ms single-thread SLA by 6.8x on 1 vCPU; high memory footprint (>1 GB)."
+    },
+    {
+      "model_id": "modernbert__command-context__champion__int8",
+      "display_name": "ModernBERT Champion (INT8 Quantized)",
+      "category": "Quantized Transformer Encoder",
+      "input_mode": "command-context",
+      "parameters": "149M (qint8 Linear)",
+      "model_size_mb": 165.0,
+      "ram_usage_mb": 650.0,
+      "latency_1vcpu_ms": {
+        "mean": 418.84,
+        "p50": 415.6,
+        "p95": 462.4,
+        "p99": 495.0
+      },
+      "sla_compliant_100ms": false,
+      "metrics": {
+        "accuracy": 0.882,
+        "macro_f1": 0.876,
+        "deny_recall": 0.885,
+        "deny_precision": 0.835,
+        "allow_precision": 0.925,
+        "allow_recall": 0.91,
+        "ask_precision": 0.852,
+        "ask_recall": 0.84,
+        "deny_to_allow_count": 7
+      },
+      "status": "Discarded for Virtech Edge",
+      "rationale": "Dynamic quantization yields 1.64x speedup, but 418 ms is still 4.2x above the 100 ms budget."
+    },
+    {
+      "model_id": "codebert__command-context__champion__fp32",
+      "display_name": "CodeBERT Champion (FP32)",
+      "category": "Transformer Encoder (Cloud Reference)",
+      "input_mode": "command-context",
+      "parameters": "125M",
+      "model_size_mb": 498.0,
+      "ram_usage_mb": 1050.0,
+      "latency_1vcpu_ms": {
+        "mean": 507.11,
+        "p50": 502.4,
+        "p95": 558.1,
+        "p99": 590.2
+      },
+      "sla_compliant_100ms": false,
+      "metrics": {
+        "accuracy": 0.9058,
+        "macro_f1": 0.9007,
+        "deny_recall": 0.8992,
+        "deny_precision": 0.8577,
+        "allow_precision": 0.9568,
+        "allow_recall": 0.9449,
+        "ask_precision": 0.8806,
+        "ask_recall": 0.866,
+        "deny_to_allow_count": 10
+      },
+      "status": "Discarded for Virtech Edge",
+      "rationale": "Exceeds 100 ms single-thread SLA by 5.0x on 1 vCPU."
+    },
+    {
+      "model_id": "codebert__command-context__champion__int8",
+      "display_name": "CodeBERT Champion (INT8 Quantized)",
+      "category": "Quantized Transformer Encoder",
+      "input_mode": "command-context",
+      "parameters": "125M (qint8 Linear)",
+      "model_size_mb": 140.0,
+      "ram_usage_mb": 520.0,
+      "latency_1vcpu_ms": {
+        "mean": 288.53,
+        "p50": 285.1,
+        "p95": 320.5,
+        "p99": 345.8
+      },
+      "sla_compliant_100ms": false,
+      "metrics": {
+        "accuracy": 0.901,
+        "macro_f1": 0.895,
+        "deny_recall": 0.892,
+        "deny_precision": 0.851,
+        "allow_precision": 0.952,
+        "allow_recall": 0.94,
+        "ask_precision": 0.875,
+        "ask_recall": 0.861,
+        "deny_to_allow_count": 11
+      },
+      "status": "Discarded for Virtech Edge",
+      "rationale": "Dynamic quantization yields 1.76x speedup, but 288 ms is still ~2.9x above the 100 ms limit."
+    },
+    {
+      "model_id": "tfidf_linear_svm__command__baseline",
+      "display_name": "Linear SVM Baseline (Uncalibrated)",
+      "category": "Classical Linear Model",
+      "input_mode": "command",
+      "parameters": "100k TF-IDF n-grams",
+      "model_size_mb": 2.1,
+      "ram_usage_mb": 45.0,
+      "latency_1vcpu_ms": {
+        "mean": 0.65,
+        "p50": 0.65,
+        "p95": 0.88,
+        "p99": 1.25
+      },
+      "sla_compliant_100ms": true,
+      "metrics": {
+        "accuracy": 0.8623,
+        "macro_f1": 0.8613,
+        "deny_recall": 0.8613,
+        "deny_precision": 0.8844,
+        "allow_precision": 0.8672,
+        "allow_recall": 0.9265,
+        "ask_precision": 0.8415,
+        "ask_recall": 0.7907,
+        "deny_to_allow_count": 19
+      },
+      "status": "Sub-optimal Safety (Misses 90% DENY Recall target)",
+      "rationale": "Ultra fast (0.65 ms) and tiny (2.1 MB), but standard argmax decision boundary leaves DENY Recall at 86.13% with 19 false allows."
+    },
+    {
+      "model_id": "tfidf_linear_svm__command__calibrated_p04",
+      "display_name": "Safety-Calibrated Linear SVM (Boost +0.4)",
+      "category": "Calibrated Classical Model (RECOMMENDED CHAMPION)",
+      "input_mode": "command",
+      "parameters": "100k TF-IDF n-grams",
+      "model_size_mb": 2.1,
+      "ram_usage_mb": 45.0,
+      "latency_1vcpu_ms": {
+        "mean": 0.65,
+        "p50": 0.65,
+        "p95": 0.88,
+        "p99": 1.25
+      },
+      "sla_compliant_100ms": true,
+      "metrics": {
+        "accuracy": 0.8755,
+        "macro_f1": 0.8743,
+        "deny_recall": 0.9424,
+        "deny_precision": 0.8124,
+        "allow_precision": 0.8929,
+        "allow_recall": 0.9022,
+        "ask_precision": 0.852,
+        "ask_recall": 0.7717,
+        "deny_to_allow_count": 11
+      },
+      "status": "SELECTED CHAMPION FOR VIRTECH PRODUCTION",
+      "rationale": "Surpasses all criteria: DENY Recall 94.24% (>90%), Macro F1 0.8743 (>0.85), 0.65 ms CPU latency (150x faster than 100 ms SLA), 2.1 MB size, false allows reduced from 19 to 11."
+    },
+    {
+      "model_id": "tfidf_linear_svm__command__calibrated_p05",
+      "display_name": "Safety-Calibrated Linear SVM (Boost +0.5)",
+      "category": "Calibrated Classical Model (High Safety Margin)",
+      "input_mode": "command",
+      "parameters": "100k TF-IDF n-grams",
+      "model_size_mb": 2.1,
+      "ram_usage_mb": 45.0,
+      "latency_1vcpu_ms": {
+        "mean": 0.65,
+        "p50": 0.65,
+        "p95": 0.88,
+        "p99": 1.25
+      },
+      "sla_compliant_100ms": true,
+      "metrics": {
+        "accuracy": 0.874,
+        "macro_f1": 0.874,
+        "deny_recall": 0.9529,
+        "deny_precision": 0.7915,
+        "allow_precision": 0.8945,
+        "allow_recall": 0.8956,
+        "ask_precision": 0.855,
+        "ask_recall": 0.7552,
+        "deny_to_allow_count": 8
+      },
+      "status": "Alternative High-Safety Candidate",
+      "rationale": "Maximum DENY recall (95.29%) and lowest false allows (8), with slight reduction in ASK recall."
+    },
+    {
+      "model_id": "tfidf_linear_svm__command-context__calibrated_p05",
+      "display_name": "Safety-Calibrated Context SVM (Boost +0.5)",
+      "category": "Context-Aware Calibrated Model",
+      "input_mode": "command-context",
+      "parameters": "100k TF-IDF n-grams",
+      "model_size_mb": 2.4,
+      "ram_usage_mb": 50.0,
+      "latency_1vcpu_ms": {
+        "mean": 1.87,
+        "p50": 1.87,
+        "p95": 2.3,
+        "p99": 3.1
+      },
+      "sla_compliant_100ms": true,
+      "metrics": {
+        "accuracy": 0.8665,
+        "macro_f1": 0.8659,
+        "deny_recall": 0.9568,
+        "deny_precision": 0.7681,
+        "allow_precision": 0.9369,
+        "allow_recall": 0.8588,
+        "ask_precision": 0.835,
+        "ask_recall": 0.7502,
+        "deny_to_allow_count": 10
+      },
+      "status": "Context-Aware Candidate",
+      "rationale": "High ALLOW precision (93.69%) and 95.68% DENY recall, but requires context assembly overhead (1.87 ms)."
+    },
+    {
+      "model_id": "tfidf_logistic_regression__command__th025",
+      "display_name": "Logistic Regression (Calibrated Threshold 0.25)",
+      "category": "Probabilistic Classical Model",
+      "input_mode": "command",
+      "parameters": "100k TF-IDF n-grams",
+      "model_size_mb": 2.1,
+      "ram_usage_mb": 45.0,
+      "latency_1vcpu_ms": {
+        "mean": 1.54,
+        "p50": 1.54,
+        "p95": 1.95,
+        "p99": 2.6
+      },
+      "sla_compliant_100ms": true,
+      "metrics": {
+        "accuracy": 0.8554,
+        "macro_f1": 0.8547,
+        "deny_recall": 0.945,
+        "deny_precision": 0.741,
+        "allow_precision": 0.889,
+        "allow_recall": 0.871,
+        "ask_precision": 0.832,
+        "ask_recall": 0.725,
+        "deny_to_allow_count": 18
+      },
+      "status": "Evaluated / Not Selected",
+      "rationale": "Provides explicit probabilities, but has lower Macro F1 and more false allows than Linear SVM."
+    }
+  ]
+}

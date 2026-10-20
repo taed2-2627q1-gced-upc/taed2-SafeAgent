@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from taed2_safeagent.config import MODEL_NAMES
+from taed2_safeagent.config import MODEL_NAMES, PROJ_ROOT
 
 
 def main():
@@ -21,6 +21,10 @@ def main():
     # Normalize the "source" column
     source_df_extra = pd.json_normalize(source_df["sources"].str[0])  # type: ignore
     source_df = pd.concat([source_df.drop(columns=["sources"]), source_df_extra], axis=1)
+
+    # Data with all features and labels, located at file "clean.jsonl"
+    clean_data_path = PROJ_ROOT / "data/interim/shell_safety/clean.jsonl"
+    clean_df = pd.read_json(clean_data_path, lines=True)
 
     # For each model predictions, join with metadata
     for model_name in MODEL_NAMES:

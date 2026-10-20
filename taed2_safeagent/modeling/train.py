@@ -6,27 +6,29 @@ import warnings
 import joblib
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.pipeline import Pipeline
-from sklearn.svm import LinearSVC
 import typer
 
 from taed2_safeagent.data.common import LABELS, write_json
 from taed2_safeagent.data.inputs import build_input
 from taed2_safeagent.features import make_vectorizer
+from taed2_safeagent.modeling.calibrated_svm import SafetyCalibratedLinearSVC
 from taed2_safeagent.modeling.common import (
     code_identity,
     dataset_identity,
     load_config,
     load_examples,
 )
+from taed2_safeagent.modeling.energy import measure_training
 
 app = typer.Typer(pretty_exceptions_show_locals=False)
 
 
 def fit_pipeline(texts, labels, settings):
+
     pipeline = Pipeline(
         [
             ("tfidf", make_vectorizer(settings["tfidf"])),
-            ("svm", LinearSVC(**settings["svm"])),
+            ("svm", SafetyCalibratedLinearSVC(**settings["svm"])),
         ]
     )
     try:
@@ -45,8 +47,14 @@ def train(params):
     texts = [build_input(row, "command") for row in rows]
     labels = [row["label"] for row in rows]
     started = perf_counter()
-    pipeline = fit_pipeline(texts, labels, settings)
+    if "energy" in params:
+        energy_report = settings["report_dir"] / "energy.json"
+        with measure_training(params["energy"], energy_report):
+            pipeline = fit_pipeline(texts, labels, settings)
+    else:
+        pipeline = fit_pipeline(texts, labels, settings)
     elapsed = perf_counter() - started
+
     metadata = {
         "model": "tfidf_char_linear_svm",
         "input_mode": "command",

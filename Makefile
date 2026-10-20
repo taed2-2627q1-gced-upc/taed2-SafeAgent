@@ -43,9 +43,10 @@ coverage:
 
 ## Check changed Python code
 lint:
-  uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
-  uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
-  uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+
 ## Build public docs
 docs:
 	uv run --frozen --group data mkdocs build --strict
