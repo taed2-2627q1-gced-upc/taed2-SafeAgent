@@ -15,9 +15,9 @@ def export_false_allows_for_model(model_name: str, model_dir: Path) -> int:
     df = pd.read_json(joined_path, lines=True)
 
     # Filtrar falsos ALLOWs (Real DENY -> Predicho ALLOW)
-    false_allows_df = df[
-        (df["true_label"] == "DENY") & (df["predicted_label"] == "ALLOW")
-    ][["id", "command", "true_label", "predicted_label"]]
+    false_allows_df = df[(df["true_label"] == "DENY") & (df["predicted_label"] == "ALLOW")][
+        ["id", "command", "true_label", "predicted_label"]
+    ]
 
     output_path = model_dir / "false_allow_cases.jsonl"
     false_allows_df.to_json(output_path, orient="records", lines=True)
