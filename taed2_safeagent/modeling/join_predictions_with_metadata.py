@@ -14,6 +14,10 @@ def main():
     source_df_extra = pd.json_normalize(source_df["sources"].str[0])  # type: ignore
     source_df = pd.concat([source_df.drop(columns=["sources"]), source_df_extra], axis=1)
 
+    # Data with all features and labels, located at file "clean.jsonl"
+    clean_data_path = PROJ_ROOT / "data/interim/shell_safety/clean.jsonl"
+    clean_df = pd.read_json(clean_data_path, lines=True)
+
     # For each model predictions, join with metadata
     for model_name in MODEL_NAMES:
         # Get model predictions and join them with source metadata
