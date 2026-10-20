@@ -15,6 +15,7 @@ from transformers import (
     ModernBertConfig,
     PreTrainedTokenizerFast,
     RobertaConfig,
+    TrainingArguments,
 )
 import yaml
 
@@ -203,3 +204,44 @@ def test_existing_output_is_preserved(tmp_path):
     with pytest.raises(ValueError, match="preserve existing"):
         encoder.fit_encoder(Path("params.yaml"), "codebert", "command", tmp_path)
     assert json.loads(marker.read_text()) == {"keep": True}
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        [1.0, 1.0],
+        [1.0, 1.0, -0.5],
+        "invalid_string",
+    ],
+)
+def test_invalid_class_weights_are_rejected(params, weights):
+    settings = params["encoders"]["training"].copy()
+    settings["class_weights"] = weights
+    with pytest.raises(ValueError, match="class_weights|positive"):
+        encoder.validate_settings(settings)
+
+
+def test_weighted_trainer_computes_loss_with_weights():
+    config = RobertaConfig(
+        vocab_size=100,
+        hidden_size=16,
+        num_hidden_layers=1,
+        num_attention_heads=2,
+        num_labels=3,
+    )
+    model = AutoModelForSequenceClassification.from_config(config)
+    weights = torch.tensor([1.0, 1.0, 3.0])
+    trainer = encoder.WeightedTrainer(
+        model=model,
+        args=TrainingArguments(output_dir="/tmp/dummy", report_to=[], use_cpu=True),
+        class_weights=weights,
+    )
+    inputs = {
+        "input_ids": torch.randint(0, 100, (2, 10)),
+        "attention_mask": torch.ones((2, 10)),
+        "labels": torch.tensor([0, 2]),
+    }
+    loss = trainer.compute_loss(model, inputs)
+    assert isinstance(loss, torch.Tensor)
+    assert loss.ndim == 0
+    assert torch.isfinite(loss)
