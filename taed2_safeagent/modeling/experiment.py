@@ -81,11 +81,16 @@ def run_experiment(params, root):
         )
         client.set_tag(receipt["run_id"], "model_dvc_stage", "train", synchronous=True)
         log_input_lock(client, receipt["run_id"], input_lock)
-        files = (
-            params["baseline"]["model_dir"] / "metadata.json",
-            lock,
-            params["baseline"]["report_dir"] / "metrics.json",
-            params["baseline"]["report_dir"] / "predictions.jsonl",
+        files = tuple(
+            path
+            for path in (
+                params["baseline"]["model_dir"] / "metadata.json",
+                lock,
+                params["baseline"]["report_dir"] / "metrics.json",
+                params["baseline"]["report_dir"] / "predictions.jsonl",
+                params["baseline"]["report_dir"] / "energy.json",
+            )
+            if path.is_file()
         )
         log_results(client, receipt["run_id"], files, metadata, metrics)
         phase = "run completion"

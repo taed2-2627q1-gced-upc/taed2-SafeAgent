@@ -191,3 +191,27 @@ def test_reported_metrics_must_match_saved_predictions(cloud_result):
             cloud_result.params_path, cloud_result.result, cloud_result.session
         )
     cloud_result.client.create_run.assert_not_called()
+
+
+def test_registered_variant_run_succeeds(cloud_result):
+    variant_settings = {
+        **cloud_result.params["encoders"]["training"],
+        "class_weights": [1.0, 1.0, 2.0],
+    }
+    bundle_copy = json.loads(json.dumps(cloud_result.params, default=str))
+    bundle_copy["encoders"]["variants"] = {"weighted": variant_settings}
+    cloud_result.params_path.write_text(yaml.safe_dump(bundle_copy), encoding="utf-8")
+
+    metadata = json.loads((cloud_result.result / "metadata.json").read_text(encoding="utf-8"))
+    metadata["variant"] = "weighted"
+    metadata["settings"] = variant_settings
+    write_json(cloud_result.result / "metadata.json", metadata)
+
+    receipt = register.register_result(
+        cloud_result.params_path,
+        cloud_result.result,
+        cloud_result.session,
+    )
+    assert receipt["source_commit"] == "a" * 40
+    tags = cloud_result.client.create_run.call_args.kwargs["tags"]
+    assert tags["variant"] == "weighted"

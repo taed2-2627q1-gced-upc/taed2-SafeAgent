@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help requirements fetch data pipeline train evaluate experiment test lint docs
+.PHONY: help requirements fetch data pipeline train evaluate experiment test coverage lint docs
 
 help:
 	@echo "Targets: requirements fetch data pipeline train evaluate experiment test lint docs"
@@ -37,11 +37,15 @@ experiment:
 test:
 	uv run --frozen --group data pytest -q
 
+## Measure test coverage on source code
+coverage:
+	uv run --frozen --group data --group dev pytest --cov=taed2_safeagent --cov-report=term-missing --cov-report=xml tests/
+
 ## Check changed Python code
 lint:
-	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
-	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling tests
+	uv run --frozen --group data pylint taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+	uv run --frozen --group data ruff check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
+	uv run --frozen --group data ruff format --check taed2_safeagent/data taed2_safeagent/dataset.py taed2_safeagent/features.py taed2_safeagent/modeling taed2_safeagent/api tests kaggle_train.py
 
 ## Build public docs
 docs:
