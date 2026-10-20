@@ -89,9 +89,7 @@ start = time.perf_counter()
 pipeline = joblib.load(model_dir / "pipeline.joblib")
 load_time = time.perf_counter() - start
 
-model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (
-    1024 * 1024
-)
+model_size_mb = sum(f.stat().st_size for f in model_dir.rglob("*") if f.is_file()) / (1024 * 1024)
 
 # Warm-up baseline
 _ = pipeline.predict(sample_inputs["command"])
