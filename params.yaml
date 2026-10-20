@@ -44,6 +44,7 @@ validation:
   require_ambiguous_commands: true
 baseline:
   input_mode: command
+  split: all
   model_dir: models/tfidf_char_linear_svm
   report_dir: reports/baseline
   tfidf:

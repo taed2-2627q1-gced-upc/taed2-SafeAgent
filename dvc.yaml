@@ -83,6 +83,8 @@ stages:
     cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train --params params.yaml
     deps:
       - ${paths.processed}/train.jsonl
+      - ${paths.processed}/validation.jsonl
+      - ${paths.processed}/test.jsonl
       - ${paths.processed}/manifest.json
       - reports/data/validation.json
       - taed2_safeagent/modeling/train.py
@@ -105,6 +107,7 @@ stages:
       - split
       - paths.processed
       - baseline.input_mode
+      - baseline.split
       - baseline.model_dir
       - baseline.report_dir
       - baseline.tfidf

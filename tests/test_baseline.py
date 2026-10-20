@@ -203,3 +203,11 @@ def test_pipeline_roundtrip_keeps_predictions(baseline_params, tmp_path):
     path = tmp_path / "model.joblib"
     joblib.dump(pipeline, path)
     assert joblib.load(path).predict(texts).tolist() == expected
+
+
+def test_train_full_dataset_loads_all_splits(baseline_params):
+    metadata = train(baseline_params, split="all")
+    train_rows = len(load_examples(baseline_params, "train"))
+    val_rows = len(load_examples(baseline_params, "validation"))
+    test_rows = len(load_examples(baseline_params, "test", allow_test=True))
+    assert metadata["train_rows"] == train_rows + val_rows + test_rows

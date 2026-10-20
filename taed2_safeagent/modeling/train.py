@@ -40,10 +40,11 @@ def fit_pipeline(texts, labels, settings):
     return pipeline
 
 
-def train(params):
-    rows = load_examples(params, "train")
-    identity = dataset_identity(params)
+def train(params, split=None):
     settings = params["baseline"]
+    dataset_split = split or settings.get("split", "train")
+    rows = load_examples(params, dataset_split, allow_test=(dataset_split in {"test", "all"}))
+    identity = dataset_identity(params)
     texts = [build_input(row, "command") for row in rows]
     labels = [row["label"] for row in rows]
     started = perf_counter()
@@ -77,9 +78,15 @@ def train(params):
 
 
 @app.command()
-def main(params: Path = Path("params.yaml")):
+def main(
+    params: Path = Path("params.yaml"),
+    split: str = typer.Option(
+        None, "--split", help="Dataset split to train on ('train', 'validation', 'all')"
+    ),
+):
     try:
-        result = train(load_config(params))
+        config = load_config(params)
+        result = train(config, split=split)
     except (ValueError, TypeError, FileNotFoundError) as error:
         typer.echo(f"Training failed: {error}", err=True)
         raise typer.Exit(1) from error
