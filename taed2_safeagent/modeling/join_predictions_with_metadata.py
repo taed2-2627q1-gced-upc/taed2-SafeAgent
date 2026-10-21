@@ -6,8 +6,16 @@ from taed2_safeagent.config import MODEL_NAMES, PROJ_ROOT
 
 
 def main():
+
+    project_root = Path(__file__).resolve().parents[2]
+    print(f"Project root: {project_root}")
+
+    # Read clean dataset for command and command length, located at file "clean.jsonl"
+    clean_data_path = project_root / Path("data/interim/shell_safety/clean.jsonl")
+    clean_df = pd.read_json(clean_data_path, lines=True)
+
     # Read source metadata, located at file "provenance.jsonl"
-    source_data_path = PROJ_ROOT / "data/interim/shell_safety/provenance.jsonl"
+    source_data_path = project_root / Path("data/interim/shell_safety/provenance.jsonl")
     source_df = pd.read_json(source_data_path, lines=True)
 
     # Normalize the "source" column
@@ -21,7 +29,7 @@ def main():
     # For each model predictions, join with metadata
     for model_name in MODEL_NAMES:
         # Get model predictions and join them with source metadata
-        predictions_path = PROJ_ROOT / Path(
+        predictions_path = project_root / Path(
             f"models/encoders/{model_name}/validation_predictions.jsonl"
         )
         predictions_df = pd.read_json(predictions_path, lines=True)
@@ -37,8 +45,8 @@ def main():
                 f"were lost during merge from model {model_name}."
             )
 
-        # Save joined dataset
-        joined_df_path = PROJ_ROOT / Path(
+        # Save joined dataset into disk
+        joined_df_path = project_root / Path(
             f"models/encoders/{model_name}/predictions_joined_with_metadata.jsonl"
         )
         joined_df.to_json(joined_df_path, orient="records", lines=True)

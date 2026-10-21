@@ -9,6 +9,10 @@ cloud of the Facultat d'Informàtica de Barcelona, UPC).
 For the Virtech deployment and live API demonstration, the team selected the
 **Safety-Calibrated Linear SVM (`models/vm_linear_svm`)**, trained on the complete dataset ($N = 33,325$).
 
+This serving artifact uses train, validation and test examples for fitting, so it
+has no independent test score. Research results use the separate baseline artifact
+and its original partitions. Deployment training rejects baseline output paths.
+
 While neural transformer models (such as ModernBERT-base with execution context) achieved
 stronger contextual accuracy during offline GPU experiments, their forward pass on a
 single CPU without hardware acceleration incurs multi-second latency per request. Because

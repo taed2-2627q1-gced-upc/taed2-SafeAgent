@@ -1,0 +1,12 @@
+Hay que poner esto en la terminal. El token lo ves en los ajustes de DagsHub. 
+
+# 1. Instalar DVC y el soporte para S3
+pip install dvc
+pip install dvc-s3
+
+# 2. Configurar las credenciales de DagsHub
+dvc remote modify storage --local access_key_id TU_TOKEN
+dvc remote modify storage --local secret_access_key TU_TOKEN
+
+# 3. Descargar los datos
+dvc pull

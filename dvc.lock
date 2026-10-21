@@ -758,6 +758,7 @@ stages:
             validation: 0.1
             test: 0.1
           tolerance: 0.01
+        vm_deployment.model_name: vm_linear_svm
         vm_deployment.input_mode: command
         vm_deployment.model_dir: models/vm_linear_svm
         vm_deployment.report_dir: reports/vm_deployment

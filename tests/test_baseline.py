@@ -205,16 +205,34 @@ def test_pipeline_roundtrip_keeps_predictions(baseline_params, tmp_path):
     assert joblib.load(path).predict(texts).tolist() == expected
 
 
-def test_train_full_dataset_loads_all_splits(baseline_params):
-    metadata = train(baseline_params, split="all")
-    train_rows = len(load_examples(baseline_params, "train"))
-    val_rows = len(load_examples(baseline_params, "validation"))
-    test_rows = len(load_examples(baseline_params, "test", allow_test=True))
-    assert metadata["train_rows"] == train_rows + val_rows + test_rows
+@pytest.mark.parametrize("split", ["validation", "test", "all"])
+def test_baseline_rejects_reserved_training_splits(baseline_params, split):
+    with pytest.raises(ValueError, match="reserved"):
+        train(baseline_params, split=split)
+    assert not baseline_params["baseline"]["model_dir"].exists()
+
+
+@pytest.mark.parametrize("field", ["model_dir", "report_dir"])
+def test_vm_training_rejects_baseline_output_paths(baseline_params, tmp_path, field):
+    params = deepcopy(baseline_params)
+    params["vm_deployment"] = deepcopy(params["baseline"])
+    params["vm_deployment"]["model_dir"] = tmp_path / "models" / "vm_linear_svm"
+    params["vm_deployment"]["report_dir"] = tmp_path / "reports" / "vm_deployment"
+    params["vm_deployment"][field] = params["baseline"][field]
+    with pytest.raises(ValueError, match="separate"):
+        train(params, config_key="vm_deployment", split="all")
+    assert not params["baseline"]["model_dir"].exists()
 
 
 def test_train_vm_deployment_creates_model(baseline_params, tmp_path):
     params = deepcopy(baseline_params)
+    train(params)
+    baseline_files = [
+        params["baseline"]["model_dir"] / "pipeline.joblib",
+        params["baseline"]["model_dir"] / "metadata.json",
+        params["baseline"]["report_dir"] / "energy.json",
+    ]
+    original_baseline = {path: path.read_bytes() for path in baseline_files}
     params["vm_deployment"] = deepcopy(params["baseline"])
     params["vm_deployment"]["model_name"] = "vm_linear_svm"
     params["vm_deployment"]["model_dir"] = tmp_path / "models" / "vm_linear_svm"
@@ -222,5 +240,10 @@ def test_train_vm_deployment_creates_model(baseline_params, tmp_path):
     params["vm_deployment"]["split"] = "all"
     metadata = train(params, config_key="vm_deployment")
     assert metadata["model"] == "vm_linear_svm"
+    assert metadata["train_rows"] == sum(
+        len(load_examples(params, split, allow_test=True))
+        for split in ("train", "validation", "test")
+    )
     assert (params["vm_deployment"]["model_dir"] / "pipeline.joblib").is_file()
     assert (params["vm_deployment"]["report_dir"] / "energy.json").is_file()
+    assert {path: path.read_bytes() for path in baseline_files} == original_baseline

@@ -179,6 +179,7 @@ stages:
       - grouping
       - split
       - paths.processed
+      - vm_deployment.model_name
       - vm_deployment.input_mode
       - vm_deployment.model_dir
       - vm_deployment.report_dir

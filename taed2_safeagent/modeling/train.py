@@ -43,6 +43,12 @@ def fit_pipeline(texts, labels, settings):
 def train(params, config_key="baseline", split=None):
     settings = params[config_key]
     dataset_split = split or settings.get("split", "train")
+    if config_key != "vm_deployment" and dataset_split != "train":
+        raise ValueError("Test is reserved and baseline fitting uses the training split only")
+    if config_key == "vm_deployment":
+        for field in ("model_dir", "report_dir"):
+            if Path(settings[field]).resolve() == Path(params["baseline"][field]).resolve():
+                raise ValueError("Deployment outputs must be separate from the baseline")
     rows = load_examples(params, dataset_split, allow_test=(dataset_split in {"test", "all"}))
     identity = dataset_identity(params)
     input_mode = settings.get("input_mode", "command")
