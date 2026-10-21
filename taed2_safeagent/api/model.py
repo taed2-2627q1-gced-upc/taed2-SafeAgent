@@ -8,7 +8,9 @@ from taed2_safeagent.api.schemas import ModelInfo
 from taed2_safeagent.data.inputs import build_input
 from taed2_safeagent.modeling.common import load_model
 
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parents[2] / "models/tfidf_char_linear_svm"
+VM_MODEL_DIR = Path(__file__).resolve().parents[2] / "models/vm_linear_svm"
+BASELINE_MODEL_DIR = Path(__file__).resolve().parents[2] / "models/tfidf_char_linear_svm"
+DEFAULT_MODEL_DIR = VM_MODEL_DIR if VM_MODEL_DIR.exists() else BASELINE_MODEL_DIR
 
 
 @dataclass

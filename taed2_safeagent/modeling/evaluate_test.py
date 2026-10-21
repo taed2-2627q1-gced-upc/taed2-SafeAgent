@@ -1,4 +1,4 @@
-# pylint: disable=duplicate-code
+# pylint: disable=R0801
 import argparse
 import json
 from pathlib import Path
@@ -112,7 +112,7 @@ def evaluate_transformer(
 
 
 def evaluate_baseline(test_df: pd.DataFrame, output_prefix: str) -> dict[str, Any]:
-    """Ejecuta inferencia con baseline Scikit-Learn."""
+    """Run inference with the baseline model."""
     model_dir = PROJ_ROOT / "models" / "tfidf_char_linear_svm"
     pipeline_path = model_dir / "pipeline.joblib"
     if not pipeline_path.exists():

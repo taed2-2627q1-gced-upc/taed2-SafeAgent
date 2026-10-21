@@ -14,7 +14,6 @@ def export_false_allows_for_model(model_name: str, model_dir: Path) -> int:
 
     df = pd.read_json(joined_path, lines=True)
 
-    # Filtrar falsos ALLOWs (Real DENY -> Predicho ALLOW)
     false_allows_df = df[(df["true_label"] == "DENY") & (df["predicted_label"] == "ALLOW")][
         ["id", "command", "true_label", "predicted_label"]
     ]
@@ -33,7 +32,6 @@ def main() -> None:
         model_dir = PROJ_ROOT / "models" / "encoders" / model_name
         export_false_allows_for_model(model_name, model_dir)
 
-    # 2. Baseline (Scikit-Learn)
     baseline_dir = PROJ_ROOT / "models" / "tfidf_char_linear_svm"
     if baseline_dir.exists():
         export_false_allows_for_model("tfidf_char_linear_svm", baseline_dir)

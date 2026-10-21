@@ -40,11 +40,19 @@ def fit_pipeline(texts, labels, settings):
     return pipeline
 
 
-def train(params):
-    rows = load_examples(params, "train")
+def train(params, config_key="baseline", split=None):
+    settings = params[config_key]
+    dataset_split = split or settings.get("split", "train")
+    if config_key != "vm_deployment" and dataset_split != "train":
+        raise ValueError("Test is reserved and baseline fitting uses the training split only")
+    if config_key == "vm_deployment":
+        for field in ("model_dir", "report_dir"):
+            if Path(settings[field]).resolve() == Path(params["baseline"][field]).resolve():
+                raise ValueError("Deployment outputs must be separate from the baseline")
+    rows = load_examples(params, dataset_split, allow_test=(dataset_split in {"test", "all"}))
     identity = dataset_identity(params)
-    settings = params["baseline"]
-    texts = [build_input(row, "command") for row in rows]
+    input_mode = settings.get("input_mode", "command")
+    texts = [build_input(row, input_mode) for row in rows]
     labels = [row["label"] for row in rows]
     started = perf_counter()
     if "energy" in params:
@@ -56,8 +64,8 @@ def train(params):
     elapsed = perf_counter() - started
 
     metadata = {
-        "model": "tfidf_char_linear_svm",
-        "input_mode": "command",
+        "model": settings.get("model_name", "tfidf_char_linear_svm"),
+        "input_mode": input_mode,
         "labels": list(LABELS),
         "settings": {key: settings[key] for key in ("tfidf", "svm")},
         "dataset": identity,
@@ -77,13 +85,24 @@ def train(params):
 
 
 @app.command()
-def main(params: Path = Path("params.yaml")):
+def main(
+    params: Path = Path("params.yaml"),
+    config_key: str = typer.Option(
+        "baseline",
+        "--config-key",
+        help="Configuration section in params.yaml ('baseline', 'vm_deployment')",
+    ),
+    split: str = typer.Option(
+        None, "--split", help="Dataset split to train on ('train', 'validation', 'all')"
+    ),
+):
     try:
-        result = train(load_config(params))
+        config = load_config(params, config_key=config_key)
+        result = train(config, config_key=config_key, split=split)
     except (ValueError, TypeError, FileNotFoundError) as error:
         typer.echo(f"Training failed: {error}", err=True)
         raise typer.Exit(1) from error
-    typer.echo(f"Baseline trained on {result['train_rows']} examples")
+    typer.echo(f"Model '{result['model']}' trained on {result['train_rows']} examples")
 
 
 if __name__ == "__main__":

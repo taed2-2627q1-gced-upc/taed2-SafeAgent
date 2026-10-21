@@ -60,6 +60,26 @@ baseline:
     dual: auto
     tol: 0.0001
     max_iter: 10000
+vm_deployment:
+  model_name: vm_linear_svm
+  input_mode: command
+  split: all
+  model_dir: models/vm_linear_svm
+  report_dir: reports/vm_deployment
+  tfidf:
+    ngram_range: [2, 5]
+    min_df: 2
+    max_features: 100000
+    sublinear_tf: true
+    norm: l2
+  svm:
+    C: 1.0
+    class_weight: balanced
+    deny_boost: 0.4
+    random_state: 42
+    dual: auto
+    tol: 0.0001
+    max_iter: 10000
 tracking:
   uri: https://dagshub.com/Pau-Balaguer/taed2-SafeAgent.mlflow
   experiment: SafeAgent

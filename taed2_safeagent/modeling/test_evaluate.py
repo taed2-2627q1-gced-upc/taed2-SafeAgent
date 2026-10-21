@@ -21,7 +21,7 @@ DEFAULT_SUMMARY_DIR = Path("reports/test_evaluation")
 
 
 def evaluate_svm(params, output_dir=DEFAULT_SVM_REPORT_DIR):
-    """Evaluate Safety-Calibrated Linear SVM on the unseen test partition."""
+    """Evaluate the calibrated linear SVM on the unseen test partition."""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 

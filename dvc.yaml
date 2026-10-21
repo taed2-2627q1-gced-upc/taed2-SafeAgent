@@ -151,3 +151,44 @@ stages:
     outs:
       - ${baseline.report_dir}/predictions.jsonl:
           cache: false
+
+  train_vm:
+    cmd: uv run --frozen --group data python -m taed2_safeagent.modeling.train --params params.yaml --config-key vm_deployment
+    deps:
+      - ${paths.processed}/train.jsonl
+      - ${paths.processed}/validation.jsonl
+      - ${paths.processed}/test.jsonl
+      - ${paths.processed}/manifest.json
+      - reports/data/validation.json
+      - taed2_safeagent/modeling/train.py
+      - taed2_safeagent/modeling/calibrated_svm.py
+      - taed2_safeagent/modeling/energy.py
+      - taed2_safeagent/config.py
+      - taed2_safeagent/modeling/common.py
+      - taed2_safeagent/modeling/__init__.py
+      - taed2_safeagent/features.py
+      - taed2_safeagent/data/common.py
+      - taed2_safeagent/data/inputs.py
+      - taed2_safeagent/data/__init__.py
+      - taed2_safeagent/__init__.py
+      - pyproject.toml
+      - uv.lock
+    params:
+      - source
+      - context
+      - grouping
+      - split
+      - paths.processed
+      - vm_deployment.model_name
+      - vm_deployment.input_mode
+      - vm_deployment.model_dir
+      - vm_deployment.report_dir
+      - vm_deployment.split
+      - vm_deployment.tfidf
+      - vm_deployment.svm
+      - energy
+    outs:
+      - ${vm_deployment.model_dir}
+    metrics:
+      - ${vm_deployment.report_dir}/energy.json:
+          cache: false
