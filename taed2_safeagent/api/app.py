@@ -26,6 +26,14 @@ PREDICTION_EXAMPLES = {
         "summary": "Classify git status",
         "value": {"command": "git status"},
     },
+    "create_branch": {
+        "summary": "Classify creating a branch (git branch feature)",
+        "value": {"command": "git branch feature"},
+    },
+    "delete_branch": {
+        "summary": "Classify deleting a branch (git branch -d feature)",
+        "value": {"command": "git branch -d feature"},
+    },
     "destructive_command": {
         "summary": "Classify a destructive command without executing it",
         "value": {"command": "rm -rf /"},
