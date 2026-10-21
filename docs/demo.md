@@ -2,6 +2,9 @@
 
 Duration: about two minutes. The requests go to the real Virtech deployment.
 
+Verified on 21 October 2026 using the Swagger buttons: all the requests below
+worked, and the automatic check passed 7/7. The loaded model was `vm_linear_svm`.
+
 Open **http://nattech.fib.upc.edu:40490/docs**.
 
 1. Expand **GET /ready**, click **Try it out** and **Execute**. Show HTTP 200,
@@ -9,7 +12,7 @@ Open **http://nattech.fib.upc.edu:40490/docs**.
 2. Expand **POST /predict** and click **Try it out**. Use the **Examples** selector
    to send the following requests, clicking **Execute** after each selection.
 
-| Example | Request | Expected result |
+| Example | Request | Verified result |
 | --- | --- | --- |
 | Classify git status | `{"command":"git status"}` | HTTP 200 and `ALLOW` |
 | Classify a destructive command without executing it | `{"command":"rm -rf /"}` | HTTP 200 and `DENY` |
