@@ -4,6 +4,10 @@ This guide documents the setup, runtime environment, model selection, service li
 and smoke testing for the **SafeAgent API** deployed on **Virtech** (the private OpenNebula
 cloud of the Facultat d'Informàtica de Barcelona, UPC).
 
+The short presentation demo uses the public API at
+`http://nattech.fib.upc.edu:40490/docs`. The [API guide](api.md#short-live-demo)
+shows the manual steps and the automatic check command.
+
 ## Model selection rationale
 
 For the Virtech deployment and live API demonstration, the team selected the
@@ -31,7 +35,9 @@ analyzed in the project report.
 
 Virtech hosts Linux virtual machines with network virtualization managed through NAT.
 When selecting a template with **sense VPN** (external NAT ports), the machine is accessible
-from the internet without needing the UPClink VPN.
+from the internet for the application ports without needing the UPClink VPN.
+The standard SSH port requires the campus network or VPN, as described in the
+[Virtech student guide](https://www.fib.upc.edu/sites/fib/files/documents/fib/serveis-tic/private_cloud_service_for_students.pdf).
 
 ### Specifications
 * **Platform**: OpenNebula (Virtech FIB UPC - `https://virtech.fib.upc.edu`)

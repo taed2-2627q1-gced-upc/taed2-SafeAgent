@@ -210,3 +210,11 @@ def test_documentation_exposes_the_single_command_contract(client):
     request = schema["components"]["schemas"]["PredictRequest"]
     assert request["required"] == ["command"]
     assert request["additionalProperties"] is False
+    predict = schema["paths"]["/predict"]["post"]
+    assert set(predict["responses"]) == {"200", "422", "500", "503"}
+    assert set(schema["paths"]["/ready"]["get"]["responses"]) == {"200", "503"}
+    examples = predict["requestBody"]["content"]["application/json"]["examples"]
+    assert examples["inspect_repository"]["value"] == {"command": "git status"}
+    assert examples["invalid_input"]["value"] == {"command": ""}
+    response = schema["components"]["schemas"]["PredictResponse"]
+    assert set(response["required"]) == {"label", "model", "model_version", "input_mode"}

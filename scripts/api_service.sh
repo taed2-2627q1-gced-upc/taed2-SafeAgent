@@ -29,7 +29,7 @@ start_service() {
     fi
 
     echo "Starting SafeAgent API on ${HOST}:${PORT}..."
-    nohup uv run --frozen uvicorn taed2_safeagent.api.app:app --host "$HOST" --port "$PORT" >> "$LOG_FILE" 2>&1 &
+    HOST="$HOST" PORT="$PORT" nohup bash scripts/run_api.sh >> "$LOG_FILE" 2>&1 < /dev/null &
     local new_pid=$!
     echo "$new_pid" > "$PID_FILE"
 
