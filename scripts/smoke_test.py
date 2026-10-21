@@ -16,6 +16,7 @@ import urllib.error
 import urllib.request
 
 DEFAULT_BASE_URL = "http://nattech.fib.upc.edu:40490"
+IDENTITY_FIELDS = ("model", "model_version", "input_mode")
 
 
 def send_request(
@@ -191,6 +192,98 @@ def run_smoke_tests(base_url: str) -> bool:
     return all_passed
 
 
+def run_demo(base_url: str, expected_version: str | None = None) -> bool:
+    """Check the public service and show a short presentation demo."""
+    print(f"SafeAgent live demo: {base_url}\n")
+    status, ready, _ = send_request(base_url, "GET", "/ready")
+    if (
+        status != 200
+        or not isinstance(ready, dict)
+        or ready.get("status") != "ready"
+        or any(not isinstance(ready.get(key), str) or not ready[key] for key in IDENTITY_FIELDS)
+    ):
+        print(f"[FAIL] Model readiness: HTTP {status}")
+        return False
+    identity = {key: ready[key] for key in IDENTITY_FIELDS}
+    if expected_version is not None and identity["model_version"] != expected_version:
+        print("[FAIL] The loaded model differs from the expected version")
+        return False
+    print("[PASS] Model ready")
+    print(json.dumps(identity, indent=2))
+
+    def valid_prediction(response, label):
+        return (
+            isinstance(response, dict)
+            and response.get("label") == label
+            and all(response.get(key) == value for key, value in identity.items())
+        )
+
+    cases = [
+        (
+            "Application alive",
+            "GET",
+            "/health",
+            None,
+            200,
+            lambda body: body == {"status": "alive"},
+        ),
+        (
+            "Swagger documentation",
+            "GET",
+            "/docs",
+            None,
+            200,
+            lambda body: isinstance(body, str) and "SwaggerUIBundle" in body,
+        ),
+        (
+            "OpenAPI schema and documented errors",
+            "GET",
+            "/openapi.json",
+            None,
+            200,
+            lambda body: (
+                isinstance(body, dict)
+                and {"200", "422", "503", "500"}.issubset(
+                    body.get("paths", {}).get("/predict", {}).get("post", {}).get("responses", {})
+                )
+            ),
+        ),
+        (
+            "git status returns ALLOW",
+            "POST",
+            "/predict",
+            {"command": "git status"},
+            200,
+            lambda body: valid_prediction(body, "ALLOW"),
+        ),
+        (
+            "Destructive command returns DENY",
+            "POST",
+            "/predict",
+            {"command": "rm -rf /"},
+            200,
+            lambda body: valid_prediction(body, "DENY"),
+        ),
+        (
+            "Empty command is rejected",
+            "POST",
+            "/predict",
+            {"command": ""},
+            422,
+            lambda body: isinstance(body, dict) and "detail" in body,
+        ),
+    ]
+    passed = 1
+    for name, method, path, payload, expected_status, validator in cases:
+        status, response, _ = send_request(base_url, method, path, payload)
+        success = status == expected_status and validator(response)
+        passed += int(success)
+        print(f"[{'PASS' if success else 'FAIL'}] {name}: HTTP {status}")
+    print(f"\nResult: {passed}/{len(cases) + 1} checks passed")
+    print("Commands were submitted as text and were never executed by this client.")
+    return passed == len(cases) + 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Smoke test SafeAgent API on Virtech")
     parser.add_argument(
@@ -198,12 +291,16 @@ def main() -> int:
         default=DEFAULT_BASE_URL,
         help=f"Base URL of the API (default: {DEFAULT_BASE_URL})",
     )
+    parser.add_argument("--demo", action="store_true", help="Run the short Swagger and model demo")
+    parser.add_argument("--expect-model-version", help="Required model version for the short demo")
     args = parser.parse_args()
-
-    success = run_smoke_tests(args.url)
+    if args.expect_model_version and not args.demo:
+        parser.error("--expect-model-version requires --demo")
+    success = (
+        run_demo(args.url, args.expect_model_version) if args.demo else run_smoke_tests(args.url)
+    )
     return 0 if success else 1
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

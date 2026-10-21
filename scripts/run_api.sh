@@ -9,7 +9,9 @@ cd "$PROJ_DIR"
 
 HOST="${HOST:-0.0.0.0}"
 PORT="${PORT:-8080}"
+export PATH="$HOME/.local/bin:$PATH"
+export SAFEAGENT_MODEL_DIR="${SAFEAGENT_MODEL_DIR:-${PROJ_DIR}/models/vm_linear_svm}"
 
 echo "Starting SafeAgent API on ${HOST}:${PORT}..."
-exec uv run --frozen uvicorn taed2_safeagent.api.app:app --host "$HOST" --port "$PORT"
+exec uv run --frozen uvicorn taed2_safeagent.api.app:app --host "$HOST" --port "$PORT" --workers 1
 

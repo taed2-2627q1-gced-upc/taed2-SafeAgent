@@ -1,7 +1,7 @@
 # Command classification API
 
 The API classifies one command per request. It serves the character TF-IDF and
-linear SVM model (`models/tfidf_char_linear_svm`), selected for lightweight, low-latency
+linear SVM model, selected for lightweight, low-latency
 CPU inference on the Virtech private cloud (see the [deployment guide](deployment.md)).
 The service never executes submitted commands or trains a model during startup.
 
@@ -16,7 +16,9 @@ uv run --frozen uvicorn taed2_safeagent.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 `SAFEAGENT_MODEL_DIR` can select another compatible saved SVM directory. The
-default is `models/tfidf_char_linear_svm` inside the repository. The model loads
+default is `models/vm_linear_svm` when that directory exists, otherwise
+`models/tfidf_char_linear_svm`. The Virtech startup script explicitly selects
+`models/vm_linear_svm` so a missing deployment model produces an error. The model loads
 once per server process through FastAPI lifespan. A change needs a server restart.
 Another model family can implement the predictor interface in `api/model.py`
 without changing the request or response format. Encoder serving is not yet
@@ -24,7 +26,8 @@ implemented by the default loader.
 
 If loading fails, the process remains alive while readiness and prediction return
 503. Fix the model configuration or recover the files, then restart the service.
-Startup does not download missing weights or fall back to another model.
+Startup does not download missing weights. An explicitly selected model directory
+does not fall back to another model.
 
 ## HTTP contract
 
@@ -35,6 +38,34 @@ Startup does not download missing weights or fall back to another model.
 | `GET /ready` | Loaded model identity, or 503 when unavailable |
 | `POST /predict` | One predicted label and model identity |
 | `GET /docs` and `GET /redoc` | Interactive API documentation |
+| `GET /openapi.json` | Generated OpenAPI schema with success and error responses |
+
+Swagger includes three request examples: `git status`, a destructive command
+submitted as text, and an empty command that demonstrates HTTP 422 validation.
+Readiness documents its 503 response, and prediction documents 422, 503 and 500.
+
+## Short live demo
+
+Open [the deployed Swagger page](http://nattech.fib.upc.edu:40490/docs).
+Call `GET /ready` to show the loaded model and its version. Expand `POST /predict`,
+select **Try it out**, and use the example selector to submit `git status`,
+`rm -rf /` and an empty command. The selected deployment model returns ALLOW,
+DENY and HTTP 422 respectively. Submitted commands are only classified.
+
+The same checks can be run from the repository without loading a local model:
+
+```sh
+python scripts/smoke_test.py --demo --url http://nattech.fib.upc.edu:40490
+```
+
+The short demo checks readiness, health, Swagger, OpenAPI, both example
+predictions and invalid input. Predictions must identify the same model as
+readiness. Add `--expect-model-version sha256:EXPECTED_HASH` to require the
+identity obtained independently from the selected model file. A failed check
+returns a nonzero exit code. These examples check service behaviour rather than
+measuring model accuracy.
+
+## Request and response
 
 Example request:
 
