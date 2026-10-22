@@ -19,6 +19,8 @@ use the session context.
 <a href="https://dagshub.com/Pau-Balaguer/taed2-SafeAgent">DagsHub and experiments</a>
 </p>
 
+<br>
+
 ## Try the API
 
 The [Swagger page](http://nattech.fib.upc.edu:40490/docs) runs against the API
@@ -59,8 +61,8 @@ Run the following commands from this repository folder. uv creates the local
 environment and installs the versions saved in uv.lock, so there is no need
 to activate the environment before each command.
 
-This setup is enough for the API and the data checks. The training libraries
-are added later when reproducing the experiments.
+This setup runs the API, data checks and CPU SVM baseline. The neural model
+libraries are added later when reproducing the encoder experiments.
 
 ### Connect to the model storage
 
@@ -117,7 +119,7 @@ the scripts for starting, stopping and restarting the service.
 
 ## Reproduce the project
 
-The full environment adds PyTorch, Transformers and CodeCarbon. It takes more
+The full environment adds PyTorch and Transformers. It takes more
 space than the API setup.
 
 ```sh

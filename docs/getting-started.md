@@ -7,14 +7,14 @@ The locked environment uses Python 3.11. uv can install that interpreter.
 uv sync --frozen --group data --group dev
 ```
 
-This environment is enough to run the API and data checks. For training,
-install the encoder libraries and CodeCarbon as well:
+This environment runs the API, data checks and CPU baseline with CodeCarbon.
+For encoder training, install the neural model libraries as well:
 
 ```sh
 uv sync --frozen --group data --group dev --group training
 ```
 
-The data group includes Great Expectations and Deepchecks. Keep the frozen
+The data group includes Great Expectations, Deepchecks and CodeCarbon. Keep the frozen
 lockfile rather than updating libraries during reproduction. PyNBLint requires
 Typer 0.12.5 and Click 8.1.8. Deepchecks requires the pinned scientific stack and
 setuptools 80.9.0. These limits avoid the import and CLI failures found during
