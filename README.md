@@ -1,19 +1,23 @@
 <p align="center">
-  <img src="docs/assets/safeagent-banner.png" alt="SafeAgent" width="960">
+  <br>
+  <img src="docs/assets/safeagent-banner.png" alt="SafeAgent" width="280">
+  <br>
 </p>
 
-# SafeAgent
-
-SafeAgent checks shell commands proposed by an AI coding agent and returns
-**ALLOW**, **ASK** or **DENY**. It reads the command as text and never executes it.
+<p align="center">
+SafeAgent checks shell commands proposed by an AI coding agent and returns<br>
+<strong>ALLOW</strong>, <strong>ASK</strong> or <strong>DENY</strong>. It reads the command as text and never executes it.<br>
 The project compares models that use only the command with models that also
 use the session context.
+</p>
 
-[Try the live API](http://nattech.fib.upc.edu:40490/docs) ·
-[OpenAPI schema](http://nattech.fib.upc.edu:40490/openapi.json) ·
-[Dataset Card](docs/dataset-card.md) ·
-[Model cards](docs/model-cards/index.md) ·
-[DagsHub and experiments](https://dagshub.com/Pau-Balaguer/taed2-SafeAgent)
+<p align="center">
+<a href="http://nattech.fib.upc.edu:40490/docs">Try the live API</a> ·
+<a href="http://nattech.fib.upc.edu:40490/openapi.json">OpenAPI schema</a> ·
+<a href="docs/dataset-card.md">Dataset Card</a> ·
+<a href="docs/model-cards/index.md">Model cards</a> ·
+<a href="https://dagshub.com/Pau-Balaguer/taed2-SafeAgent">DagsHub and experiments</a>
+</p>
 
 ## Try the API
 
