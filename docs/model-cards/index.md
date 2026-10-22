@@ -1,7 +1,7 @@
 # Model cards
 
 These cards describe the SafeAgent classifiers. The classical baseline has a
-fitted model and validation results. The transformer cards are still drafts.
+fitted model and validation results.
 
 - [TF-IDF character n-grams + Linear SVM](model_card_tfidf_linear_svm.md):
   command-only classical baseline, with validation results.
