@@ -40,17 +40,19 @@ does not fall back to another model.
 | `GET /docs` and `GET /redoc` | Interactive API documentation |
 | `GET /openapi.json` | Generated OpenAPI schema with success and error responses |
 
-Swagger includes three request examples: `git status`, a destructive command
-submitted as text, and an empty command that demonstrates HTTP 422 validation.
+Swagger includes five request examples: `git status`, branch creation, branch
+deletion, a destructive command submitted as text, and an empty command that
+demonstrates HTTP 422 validation.
 Readiness documents its 503 response, and prediction documents 422, 503 and 500.
 
 ## Short live demo
 
 Open [the deployed Swagger page](http://nattech.fib.upc.edu:40490/docs).
 Call `GET /ready` to show the loaded model and its version. Expand `POST /predict`,
-select **Try it out**, and use the example selector to submit `git status`,
-`rm -rf /` and an empty command. The selected deployment model returns ALLOW,
-DENY and HTTP 422 respectively. Submitted commands are only classified.
+select **Try it out**, and use the example selector. The deployed model returns
+ALLOW for `git status` and `git branch feature`, ASK for `git branch -d feature`,
+DENY for `rm -rf /`, and HTTP 422 for an empty command. Submitted commands are
+only classified.
 
 The same checks can be run from the repository without loading a local model:
 
