@@ -15,6 +15,8 @@ Open **http://nattech.fib.upc.edu:40490/docs**.
 | Example | Request | Verified result |
 | --- | --- | --- |
 | Classify git status | `{"command":"git status"}` | HTTP 200 and `ALLOW` |
+| Classify creating a branch | `{"command":"git branch feature"}` | HTTP 200 and `ALLOW` |
+| Classify deleting a branch | `{"command":"git branch -d feature"}` | HTTP 200 and `ASK` |
 | Classify a destructive command without executing it | `{"command":"rm -rf /"}` | HTTP 200 and `DENY` |
 | Show input validation with an empty command | `{"command":""}` | HTTP 422 with validation details |
 
@@ -23,9 +25,12 @@ The service only classifies the submitted text.
 
 Suggested explanation:
 
-> First, the readiness check shows that the model is loaded. Then we send two
-> commands and get different predictions. Finally, an empty command is rejected.
-> These are requests to the deployed service, and the commands are never executed.
+> First, the readiness check shows that the model is loaded. Next, we demonstrate
+> fine-grained nuance: `git branch feature` is classified as `ALLOW`, but adding
+> the `-d` flag (`git branch -d feature`) changes the prediction to `ASK` for human
+> confirmation before deletion. Then, a destructive command is blocked with `DENY`,
+> and an empty command is rejected with HTTP 422 validation. These commands are
+> submitted as text and are never executed.
 
 The complete quick check can also be run from the repository:
 
